@@ -75,7 +75,7 @@ https://weihong-liu.github.io/hello-ai-infra/
 
 | 姓名 | 职责 | 简介 |
 | :---- | :---- | :---- |
-| Weihong Liu | 项目负责人 | AI Infra 方向，专注 AMD GPU 优化与 AI 编译器 |
+| 刘伟鸿 | 项目负责人 | DataWhale成员 |
 
 ## 参与贡献
 
