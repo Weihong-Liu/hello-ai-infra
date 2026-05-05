@@ -1,0 +1,135 @@
+/* ============================================================================
+   Announcement Banner
+   ============================================================================ */
+:root {
+  --vp-layout-top-height: 40px;
+}
+
+.announcement-banner {
+  background: linear-gradient(90deg, #ffdfae 0%, #ffbd53 100%);
+  color: #000;
+  padding: 8px 16px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  height: var(--vp-layout-top-height);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--vp-z-index-layout-top, 40);
+}
+
+.dark .announcement-banner {
+  background: linear-gradient(90deg, #5e4219 0%, #583c10 100%);
+  color: #fff;
+}
+
+/* ============================================================================
+   Layout
+   ============================================================================ */
+:root {
+  --vp-layout-max-width: 95%;
+  --vp-sidebar-width: 300px;
+  --vp-c-brand-1: #6366f1;
+  --vp-c-brand-2: #4f46e5;
+  --vp-c-brand-3: #4338ca;
+}
+
+/* ============================================================================
+   Content Width Overrides
+   ============================================================================ */
+.VPDoc:not(.has-sidebar) .container {
+  max-width: 2000px !important;
+}
+
+.VPDoc:not(.has-sidebar) .content {
+  max-width: 1264px !important;
+}
+
+.VPDoc.has-aside .content-container {
+  max-width: 1168px !important;
+}
+
+.VPDoc .container {
+  margin: 0;
+}
+
+/* ============================================================================
+   Image Styles
+   ============================================================================ */
+.vp-doc img {
+  max-height: 50vh;
+  width: auto;
+  display: block;
+}
+
+.vp-doc img+em {
+  display: block;
+  text-align: center;
+  color: var(--vp-c-text-2);
+  font-size: 0.9em;
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ============================================================================
+   Doc Content Typography
+   ============================================================================ */
+.vp-doc {
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.vp-doc h1 {
+  margin-top: 0;
+  font-size: 1.8rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  padding-bottom: 0.4em;
+}
+
+.vp-doc h2 {
+  margin-top: 2em;
+  font-size: 1.35rem;
+}
+
+.vp-doc blockquote {
+  border-left: 4px solid var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+  padding: 0.8em 1.2em;
+  border-radius: 6px;
+}
+
+/* ============================================================================
+   Table
+   ============================================================================ */
+th,
+td {
+  width: 10%;
+}
+
+/* ============================================================================
+   Font
+   ============================================================================ */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    sans-serif;
+}
+
+/* ============================================================================
+   Scrollbar
+   ============================================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+}
