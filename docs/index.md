@@ -29,9 +29,9 @@ import { VPTeamMembers } from 'vitepress/theme'
 
 const members = [
   {
-    avatar: 'https://www.github.com/Weihong-Liu.png',
-    name: 'Weihong Liu',
-    title: '项目负责人',
+    avatar: 'https://avatars.githubusercontent.com/u/65588374?v=4',
+    name: '刘伟鸿',
+    title: '项目负责人 · DataWhale成员',
     links: [
       { icon: 'github', link: 'https://github.com/Weihong-Liu' },
     ]

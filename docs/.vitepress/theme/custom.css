@@ -5,6 +5,24 @@
   --vp-layout-top-height: 40px;
 }
 
+/* Fix VPTeamMembers avatar misalignment */
+.VPTeamMembers .avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.VPTeamMembers .avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .announcement-banner {
   background: linear-gradient(90deg, #ffdfae 0%, #ffbd53 100%);
   color: #000;
