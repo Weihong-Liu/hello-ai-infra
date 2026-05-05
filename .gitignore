@@ -6,3 +6,4 @@ reference_repositories/
 *.pyc
 __pycache__/
 .env
+package-lock.json
