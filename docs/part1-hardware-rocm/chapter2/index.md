@@ -1,38 +1,48 @@
 ---
-title: "第2章 AMD GPU 与 ROCm 软件栈"
-description: "Hello AI Infra 第2章"
+title: "第3章 AMD GPU 与 ROCm 软件栈"
+description: "Hello AI Infra 第3章 · AMD GPU 执行模型、ROCm 层次、上层框架关系"
 ---
 
-# 第2章 AMD GPU 与 ROCm 软件栈
+# 第3章 AMD GPU 与 ROCm 软件栈
 
 ## 本章导读
 
-本章深入 AMD GPU 硬件架构和 ROCm 软件栈，为后续优化实践奠定基础。
+> 本章建立后续优化会反复用到的 AMD GPU 最小心智模型，同时解释 ROCm 软件栈如何把上层框架连接到硬件。读完后，你应该能看懂后续章节里 CU、Wavefront、LDS、HIP、MIGraphX 等词的位置。
 
-## 2.1 AMD GPU 基本架构
+## 3.1 AMD GPU 基本架构
 
-介绍 AMD GPU 的核心概念：CU、Wavefront、SIMD 执行模型。
+介绍 CU、Wavefront 和 SIMD 执行模型，建立硬件执行的第一层直觉。
 
-## 2.2 CU、Wavefront、SIMD、LDS、VGPR、SGPR
+## 3.2 CU、Wavefront、SIMD、LDS、VGPR、SGPR
 
-逐一解释 AMD GPU 的关键硬件单元，与 NVIDIA GPU 的对应概念做类比。
+解释关键硬件单元，并用后续算子优化会遇到的问题来理解它们。
 
-## 2.3 HBM、Cache 与访存层次
+## 3.3 HBM、Cache 与访存层次
 
-理解显存带宽、缓存层次对 AI 计算性能的决定性影响。
+理解显存带宽、缓存层次和数据复用为什么影响 AI 算子性能。
 
-## 2.4 ROCm 是什么
+## 3.4 ROCm 是什么
 
-ROCm 生态全景：驱动、运行时、编译器、工具链的层次关系。
+用分层图理解驱动、运行时、编译器、库和工具链之间的关系。
 
-## 2.5 HIP、HSA、AMDGPU Driver 的关系
+## 3.5 HIP、HSA、AMDGPU Driver 的关系
 
-厘清 HIP、HSA、AMDGPU 驱动之间的层次。
+厘清 HIP 程序如何经由运行时和驱动落到设备执行。
 
-## 2.6 PyTorch / Triton / MIGraphX / vLLM 与 ROCm 的关系
+## 3.6 PyTorch / Triton / MIGraphX / vLLM 与 ROCm 的关系
 
-展示上层框架如何对接 ROCm 底层。
+说明上层框架如何依赖 ROCm 能力，但不在本章展开使用细节。
 
-## 2.7 如何检查一台机器的 AMD GPU 环境
+## 3.7 如何检查一台机器的 AMD GPU 环境
 
-动手实践：用 rocminfo、rocm-smi 等工具检查 GPU 环境。
+把环境检查命令放回软件栈语境中，解释每个命令在检查什么。
+
+## 本章小结
+
+- 本章目前是 Alpha 阶段的大纲骨架，正式正文会在对应实验跑通后补齐。
+- 涉及命令、输出或性能数字的内容，后续必须在 AI MAX 395 + ROCm 7.12.0 上实测。
+- 与本章相关的代码、日志和实验底稿会放在 `code/part1-hardware-rocm/chapter2/`。
+
+## 延伸阅读
+
+- 待补：正式正文完成时补充对应官方文档、论文或工具链接。

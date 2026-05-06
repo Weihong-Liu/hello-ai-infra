@@ -1,40 +1,48 @@
 ---
-title: "第9章 Reduction 优化"
-description: "Hello AI Infra 第9章"
+title: "第11章 Reduction 优化"
+description: "Hello AI Infra 第11章 · Naive Reduction、LDS、Wavefront、多阶段 Reduction、性能对比"
 ---
 
-# 第9章 Reduction 优化
+# 第11章 Reduction 优化
 
 ## 本章导读
 
-本章通过 Reduction 优化，教你逐步提升 GPU kernel 性能。
+> 本章进入第一个真正体现 GPU 层级协作的算子：Reduction。读完后，你应该能理解为什么跨线程汇总需要 LDS、同步和多阶段设计。
 
-## 9.1 Reduction 为什么重要
+## 11.1 Reduction 为什么重要
 
-Reduction 是 Sum、Mean、Max、Min 等操作的基础。
+说明求和、归约、归一化和注意力中为什么经常出现 reduction。
 
-## 9.2 Naive Reduction
+## 11.2 Naive Reduction
 
-实现最简单的 GPU Reduction。
+从简单但低效的实现开始，观察瓶颈。
 
-## 9.3 Shared Memory / LDS 优化
+## 11.3 Shared Memory / LDS 优化
 
-利用 LDS 减少全局显存访问次数。
+使用 LDS 减少全局内存访问并组织 block 内归约。
 
-## 9.4 Warp / Wavefront 级优化思路
+## 11.4 Warp / Wavefront 级优化思路
 
-利用 Wavefront 内的硬件同步机制。
+理解 wavefront 内协作和分支收敛对 reduction 的影响。
 
-## 9.5 多阶段 Reduction
+## 11.5 多阶段 Reduction
 
-实现分块 Reduction 的多阶段策略。
+把大规模输入拆成 block 内归约和跨 block 合并。
 
-## 9.6 性能对比
+## 11.6 性能对比
 
-对比各阶段的性能提升。
+用 benchmark 和 profiling 对比不同版本。
 
-## 思考题
+## 11.7 思考题
 
-1. 本章的优化中，哪个步骤带来的性能提升最大？为什么？
-2. 如果换一个更大的数据规模，优化策略需要调整吗？
-3. 本章中哪些步骤可以被 Agent 自动化？
+分析不同输入长度和 block size 对性能的影响。
+
+## 本章小结
+
+- 本章目前是 Alpha 阶段的大纲骨架，正式正文会在对应实验跑通后补齐。
+- 涉及命令、输出或性能数字的内容，后续必须在 AI MAX 395 + ROCm 7.12.0 上实测。
+- 与本章相关的代码、日志和实验底稿会放在 `code/part3-hip-kernels/chapter9/`。
+
+## 延伸阅读
+
+- 待补：正式正文完成时补充对应官方文档、论文或工具链接。

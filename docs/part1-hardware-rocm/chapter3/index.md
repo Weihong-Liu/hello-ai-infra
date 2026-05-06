@@ -1,34 +1,44 @@
 ---
-title: "第3章 第一个 AMD GPU 程序"
-description: "Hello AI Infra 第3章"
+title: "第4章 第一个 AMD GPU 程序"
+description: "Hello AI Infra 第4章 · PyTorch ROCm、最小 HIP kernel、baseline benchmark"
 ---
 
-# 第3章 第一个 AMD GPU 程序
+# 第4章 第一个 AMD GPU 程序
 
 ## 本章导读
 
-本章是动手实践的第一步，带你搭建 ROCm 环境并跑通第一个 GPU 程序。
+> 本章在已经验证环境可用的基础上，带你跑通第一个真正的 AMD GPU 程序。重点不是安装百科，而是建立后续实验都会复用的代码、计时和日志习惯。
 
-## 3.1 安装 ROCm 环境
+## 4.1 确认当前章节环境
 
-手把手安装 ROCm，包括驱动、运行时、HIP 编译器。
+复用 Part 0 的环境基线，确认当前章节代码目录和运行环境已经就绪。
 
-## 3.2 使用 rocminfo 查看硬件信息
+## 4.2 读取硬件信息
 
-读取 GPU 型号、CU 数量、显存大小等关键信息。
+用 rocminfo 和 rocm-smi 记录实验机器的关键上下文。
 
-## 3.3 使用 rocm-smi 查看显卡状态
+## 4.3 跑通 PyTorch ROCm
 
-学会查看 GPU 利用率、显存占用、功耗、温度等运行时状态。
+运行最小 tensor 运算，确认 PyTorch 能把计算放到 AMD GPU 上。
 
-## 3.4 跑通 PyTorch ROCm
+## 4.4 跑通第一个 HIP kernel
 
-安装 PyTorch ROCm 版本，验证 GPU 可用性。
+编写、编译并运行一个最小 HIP kernel。
 
-## 3.5 跑通第一个 HIP kernel
+## 4.5 建立 baseline benchmark
 
-编写、编译、运行第一个 HIP kernel。
+用固定输入、热身、重复运行和日志文件建立可复现的计时 baseline。
 
-## 3.6 建立 baseline benchmark
+## 4.6 留下实验底稿
 
-用 Python 脚本建立计时 baseline，为后续优化实验做准备。
+说明代码、日志和 EXPERIMENT.md 应该如何对应。
+
+## 本章小结
+
+- 本章目前是 Alpha 阶段的大纲骨架，正式正文会在对应实验跑通后补齐。
+- 涉及命令、输出或性能数字的内容，后续必须在 AI MAX 395 + ROCm 7.12.0 上实测。
+- 与本章相关的代码、日志和实验底稿会放在 `code/part1-hardware-rocm/chapter3/`。
+
+## 延伸阅读
+
+- 待补：正式正文完成时补充对应官方文档、论文或工具链接。

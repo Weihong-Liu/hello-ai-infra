@@ -1,30 +1,40 @@
 ---
-title: "第25章 为什么 AI Infra 需要 Agent"
-description: "Hello AI Infra 第25章"
+title: "第29章 为什么 AI Infra 需要 Agent"
+description: "Hello AI Infra 第29章 · 人类优化流程、可自动化环节、LLM 角色、AutoInfra 总架构"
 ---
 
-# 第25章 为什么 AI Infra 需要 Agent
+# 第29章 为什么 AI Infra 需要 Agent
 
 ## 本章导读
 
-本章提出本教程的核心创新：用 AI Agent 自动化 AI Infra 优化流程。
+> 本章解释为什么 Agent 适合作为全书终点：它不是替代 profiling，而是把已经学过的 benchmark、profiling、优化假设和报告流程自动串起来。
 
-## 25.1 人类优化专家的工作流
+## 29.1 人类优化专家的工作流
 
-分析 AI Infra 优化专家的典型工作流程。
+复盘一个工程师从发现慢到验证优化的完整流程。
 
-## 25.2 哪些步骤可以自动化
+## 29.2 哪些步骤可以自动化
 
-识别适合自动化的环节。
+区分命令执行、日志解析、报告生成和代码修改等自动化边界。
 
-## 25.3 LLM 在优化流程里的角色
+## 29.3 LLM 在优化流程里的角色
 
-分析 LLM 如何参与优化流程。
+说明 LLM 适合做解释、规划和代码候选，但不能替代实测。
 
-## 25.4 Agent 不能替代 profiling，但可以放大 profiling 的价值
+## 29.4 Agent 不能替代 profiling，但可以放大 profiling 的价值
 
-界定 Agent 能做什么和不能做什么。
+强调实验真实性和硬件反馈仍然是判断依据。
 
-## 25.5 AutoInfra Agent 总架构
+## 29.5 AutoInfra Agent 总架构
 
-展示整体架构和各模块协作方式。
+预览后续章节将逐步搭建的系统闭环。
+
+## 本章小结
+
+- 本章目前是 Alpha 阶段的大纲骨架，正式正文会在对应实验跑通后补齐。
+- 涉及命令、输出或性能数字的内容，后续必须在 AI MAX 395 + ROCm 7.12.0 上实测。
+- 与本章相关的代码、日志和实验底稿会放在 `code/part7-agent/chapter25/`。
+
+## 延伸阅读
+
+- 待补：正式正文完成时补充对应官方文档、论文或工具链接。

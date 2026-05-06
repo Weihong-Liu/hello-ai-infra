@@ -1,36 +1,44 @@
 ---
-title: "第11章 LayerNorm 优化"
-description: "Hello AI Infra 第11章"
+title: "第13章 LayerNorm 优化"
+description: "Hello AI Infra 第13章 · 均值方差、Reduction + Normalize 融合、向量化读写、性能分析"
 ---
 
-# 第11章 LayerNorm 优化
+# 第13章 LayerNorm 优化
 
 ## 本章导读
 
-本章优化 LayerNorm，学习 kernel 融合技巧。
+> 本章用 LayerNorm 继续练习 reduction，并引入融合与向量化读写的思路。读完后，你应该能解释为什么把多步归一化合在一个 kernel 里通常更高效。
 
-## 11.1 LayerNorm 原理
+## 13.1 LayerNorm 原理
 
-理解 LayerNorm 的数学公式。
+回顾均值、方差、缩放和平移的计算流程。
 
-## 11.2 均值与方差计算
+## 13.2 均值与方差计算
 
-将均值和方差拆解为 Reduction 操作。
+把两个 reduction 放到 GPU 执行模型里分析。
 
-## 11.3 Reduction + Normalize 融合
+## 13.3 Reduction + Normalize 融合
 
-将多个 kernel 融合为一个。
+减少 kernel launch 和中间数据写回。
 
-## 11.4 向量化读写
+## 13.4 向量化读写
 
-利用向量化加载提升访存效率。
+观察数据对齐和一次处理多个元素对性能的影响。
 
-## 11.5 性能分析
+## 13.5 性能分析
 
-对比融合与分离 kernel 的性能差异。
+用 profiling 判断瓶颈是否仍然来自访存。
 
-## 思考题
+## 13.6 思考题
 
-1. 本章的优化中，哪个步骤带来的性能提升最大？为什么？
-2. 如果换一个更大的数据规模，优化策略需要调整吗？
-3. 本章中哪些步骤可以被 Agent 自动化？
+比较不同 hidden size 和 batch size 下的实现选择。
+
+## 本章小结
+
+- 本章目前是 Alpha 阶段的大纲骨架，正式正文会在对应实验跑通后补齐。
+- 涉及命令、输出或性能数字的内容，后续必须在 AI MAX 395 + ROCm 7.12.0 上实测。
+- 与本章相关的代码、日志和实验底稿会放在 `code/part3-hip-kernels/chapter11/`。
+
+## 延伸阅读
+
+- 待补：正式正文完成时补充对应官方文档、论文或工具链接。

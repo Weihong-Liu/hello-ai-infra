@@ -1,26 +1,40 @@
 ---
-title: "第26章 Hardware Inspector"
-description: "Hello AI Infra 第26章"
+title: "第30章 实验资产与数据结构"
+description: "Hello AI Infra 第30章 · 硬件画像、实验配置、benchmark 结果、profiling 输出、报告数据模型"
 ---
 
-# 第26章 Hardware Inspector
+# 第30章 实验资产与数据结构
 
 ## 本章导读
 
-本章实现 AutoInfra Agent 的第一个模块：Hardware Inspector。
+> 本章先定义 Agent 系统要读写哪些数据，而不是急着写多个 Agent 类。读完后，你应该能理解硬件信息、实验配置、日志和报告之间如何关联。
 
-## 26.1 自动读取 GPU 型号
+## 30.1 硬件画像
 
-实现自动检测 GPU 硬件参数。
+记录 GPU 型号、ROCm 版本、显存和关键能力。
 
-## 26.2 自动读取显存、驱动、ROCm 版本
+## 30.2 实验配置
 
-收集软件环境信息。
+描述输入规模、命令、参数、版本和运行时间。
 
-## 26.3 自动生成硬件画像
+## 30.3 Benchmark 结果
 
-整理为结构化的硬件能力画像。
+规范 latency、throughput、memory 等指标的保存方式。
 
-## 26.4 自动判断当前环境是否可用
+## 30.4 Profiling 输出
 
-检查环境是否就绪。
+保存 timeline、kernel 表和硬件计数器摘要。
+
+## 30.5 报告数据模型
+
+把实验资产组织成后续 Agent 可以消费的结构。
+
+## 本章小结
+
+- 本章目前是 Alpha 阶段的大纲骨架，正式正文会在对应实验跑通后补齐。
+- 涉及命令、输出或性能数字的内容，后续必须在 AI MAX 395 + ROCm 7.12.0 上实测。
+- 与本章相关的代码、日志和实验底稿会放在 `code/part7-agent/chapter26/`。
+
+## 延伸阅读
+
+- 待补：正式正文完成时补充对应官方文档、论文或工具链接。
