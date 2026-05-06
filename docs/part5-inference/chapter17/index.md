@@ -1,30 +1,44 @@
 ---
-title: "第17章 ONNX Runtime / MIGraphX 推理优化"
-description: "Hello AI Infra 第17章"
+title: "第21章 ONNX Runtime / MIGraphX 工具实战"
+description: "Hello AI Infra 第21章 · ONNX 导出、ROCm 推理、MIGraphX 运行、工具层性能对比"
 ---
 
-# 第17章 ONNX Runtime / MIGraphX 推理优化
+# 第21章 ONNX Runtime / MIGraphX 工具实战
 
 ## 本章导读
 
-本章学习使用 ONNX Runtime 和 MIGraphX 进行推理优化。
+> 本章只站在工具使用者角度，带你把模型导出、加载、运行并做性能对比。图优化为什么有效会留到编译器篇讲，这里重点是怎么正确使用和记录结果。
 
-## 17.1 ONNX 模型导出
+## 21.1 ONNX 模型导出
 
-将 PyTorch 模型导出为 ONNX 格式。
+从 PyTorch 模型导出 ONNX，并检查输入输出签名。
 
-## 17.2 ONNX Runtime on ROCm
+## 21.2 ONNX Runtime on ROCm
 
-在 AMD GPU 上使用 ONNX Runtime。
+在 ROCm 环境下运行 ONNX Runtime，并记录基线性能。
 
-## 17.3 MIGraphX 基础
+## 21.3 MIGraphX 基础运行
 
-介绍 AMD 的 MIGraphX 推理引擎。
+使用 MIGraphX 加载和执行模型，观察工具链差异。
 
-## 17.4 图优化：算子融合、常量折叠、布局优化
+## 21.4 开启工具层优化选项
 
-理解图优化 pass 对性能的影响。
+只介绍如何使用优化选项，不在本章展开优化原理。
 
-## 17.5 模型推理性能对比
+## 21.5 模型推理性能对比
 
-对比 PyTorch、ONNX Runtime、MIGraphX 的推理性能。
+用相同输入和指标比较 PyTorch、ONNX Runtime、MIGraphX。
+
+## 21.6 结果记录与风险说明
+
+标注硬件、版本、模型和已验证边界。
+
+## 本章小结
+
+- 本章目前是 Alpha 阶段的大纲骨架，正式正文会在对应实验跑通后补齐。
+- 涉及命令、输出或性能数字的内容，后续必须在 AI MAX 395 + ROCm 7.12.0 上实测。
+- 与本章相关的代码、日志和实验底稿会放在 `code/part5-inference/chapter17/`。
+
+## 延伸阅读
+
+- 待补：正式正文完成时补充对应官方文档、论文或工具链接。

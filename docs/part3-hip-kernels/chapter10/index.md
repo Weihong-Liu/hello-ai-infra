@@ -1,40 +1,48 @@
 ---
-title: "第10章 Softmax 优化"
-description: "Hello AI Infra 第10章"
+title: "第12章 Softmax 优化"
+description: "Hello AI Infra 第12章 · 数值稳定性、访存优化、Block 级并行、PyTorch 对齐"
 ---
 
-# 第10章 Softmax 优化
+# 第12章 Softmax 优化
 
 ## 本章导读
 
-本章优化 Transformer 中最关键的 Softmax 算子。
+> 本章用 Softmax 把 reduction、数值稳定性和访存优化串起来。读完后，你应该能写出一个结果正确、能被 benchmark 和 profiling 验证的教学版 Softmax。
 
-## 10.1 Softmax 在 Transformer 中的位置
+## 12.1 Softmax 在 Transformer 中的位置
 
-理解 Softmax 在 Self-Attention 中的核心角色。
+说明为什么 Softmax 是理解注意力性能的重要入口。
 
-## 10.2 Naive Softmax
+## 12.2 Naive Softmax
 
-实现最直接的 GPU Softmax。
+从直接实现开始，观察重复访存和数值问题。
 
-## 10.3 数值稳定性
+## 12.3 数值稳定性
 
-学习 log-sum-exp 技巧。
+使用减去最大值的形式避免指数溢出。
 
-## 10.4 访存优化
+## 12.4 访存优化
 
-减少全局显存读写次数。
+减少多次读取和写回，理解中间结果如何组织。
 
-## 10.5 Block 级并行
+## 12.5 Block 级并行
 
-利用共享内存加速 Softmax 计算。
+用 block 内协作处理一行或一段数据。
 
-## 10.6 与 PyTorch 结果对齐
+## 12.6 与 PyTorch 结果对齐
 
-验证优化后输出与 PyTorch 一致。
+确认数值误差、输入范围和边界条件。
 
-## 思考题
+## 12.7 思考题
 
-1. 本章的优化中，哪个步骤带来的性能提升最大？为什么？
-2. 如果换一个更大的数据规模，优化策略需要调整吗？
-3. 本章中哪些步骤可以被 Agent 自动化？
+分析不同 hidden size 下实现策略的变化。
+
+## 本章小结
+
+- 本章目前是 Alpha 阶段的大纲骨架，正式正文会在对应实验跑通后补齐。
+- 涉及命令、输出或性能数字的内容，后续必须在 AI MAX 395 + ROCm 7.12.0 上实测。
+- 与本章相关的代码、日志和实验底稿会放在 `code/part3-hip-kernels/chapter10/`。
+
+## 延伸阅读
+
+- 待补：正式正文完成时补充对应官方文档、论文或工具链接。

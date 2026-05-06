@@ -1,34 +1,44 @@
 ---
-title: "第22章 图优化基础"
-description: "Hello AI Infra 第22章"
+title: "第26章 图优化原理基础"
+description: "Hello AI Infra 第26章 · 算子融合、常量折叠、死代码消除、布局优化、Memory Planning 原理"
 ---
 
-# 第22章 图优化基础
+# 第26章 图优化原理基础
 
 ## 本章导读
 
-本章学习 AI 编译器中图优化的核心技术。
+> 本章只讲图优化背后的原理，不重复第 17 章的工具命令。读完后，你应该能解释为什么工具打开某些优化选项后，模型可能更快或更省显存。
 
-## 22.1 Operator Fusion
+## 26.1 Operator Fusion
 
-学习算子融合原理。
+理解算子融合如何减少中间写回、kernel launch 和内存带宽压力。
 
-## 22.2 Constant Folding
+## 26.2 Constant Folding
 
-学习常量折叠。
+说明常量计算为什么可以提前完成。
 
-## 22.3 Dead Code Elimination
+## 26.3 Dead Code Elimination
 
-学习死代码消除。
+理解无用节点如何被删除。
 
-## 22.4 Common Subexpression Elimination
+## 26.4 Common Subexpression Elimination
 
-学习公共子表达式消除。
+观察重复计算如何被复用。
 
-## 22.5 Layout Transform
+## 26.5 Layout Transform
 
-学习内存布局优化。
+说明数据布局为什么影响后端 kernel 的访问效率。
 
-## 22.6 Memory Planning
+## 26.6 Memory Planning
 
-学习内存规划。
+理解内存复用和生命周期分析如何降低峰值显存。
+
+## 本章小结
+
+- 本章目前是 Alpha 阶段的大纲骨架，正式正文会在对应实验跑通后补齐。
+- 涉及命令、输出或性能数字的内容，后续必须在 AI MAX 395 + ROCm 7.12.0 上实测。
+- 与本章相关的代码、日志和实验底稿会放在 `code/part6-compiler/chapter22/`。
+
+## 延伸阅读
+
+- 待补：正式正文完成时补充对应官方文档、论文或工具链接。
