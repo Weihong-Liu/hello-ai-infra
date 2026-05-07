@@ -2,6 +2,7 @@ import DefaultTheme from 'vitepress/theme'
 import './custom.css'
 import type { Theme } from 'vitepress'
 import { h } from 'vue'
+import MermaidDiagram from './MermaidDiagram.vue'
 
 const Announcement = () => h('div', {
   class: 'announcement-banner',
@@ -9,6 +10,9 @@ const Announcement = () => h('div', {
 
 export default {
   extends: DefaultTheme,
+  enhanceApp({ app }) {
+    app.component('MermaidDiagram', MermaidDiagram)
+  },
   Layout() {
     return h(DefaultTheme.Layout, null, {
       'layout-top': () => h(Announcement)

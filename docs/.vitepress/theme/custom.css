@@ -98,6 +98,31 @@
 }
 
 /* ============================================================================
+   Mermaid Diagrams
+   ============================================================================ */
+.mermaid-block {
+  margin: 24px 0 8px;
+  padding: 16px;
+  overflow-x: auto;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg-soft);
+}
+
+.mermaid-block svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.mermaid-error {
+  margin-top: 12px;
+  color: var(--vp-c-danger-1);
+  white-space: pre-wrap;
+}
+
+/* ============================================================================
    Doc Content Typography
    ============================================================================ */
 .vp-doc {

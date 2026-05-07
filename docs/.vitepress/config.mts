@@ -1,6 +1,10 @@
 import { defineConfig } from 'vitepress'
 import { navItems, sidebar } from './outline.mjs'
 
+function encodeMermaid(value: string) {
+  return encodeURIComponent(value)
+}
+
 const isEdgeOne = process.env.EDGEONE === '1'
 const baseConfig = isEdgeOne ? '/' : '/hello-ai-infra/'
 
@@ -11,6 +15,22 @@ export default defineConfig({
   base: baseConfig,
 
   cleanUrls: true,
+
+  markdown: {
+    config(md) {
+      const fence = md.renderer.rules.fence!
+      md.renderer.rules.fence = (tokens, idx, options, env, self) => {
+        const token = tokens[idx]
+        const language = token.info.trim().split(/\s+/)[0]
+
+        if (language === 'mermaid') {
+          return `<MermaidDiagram code="${encodeMermaid(token.content)}" />`
+        }
+
+        return fence(tokens, idx, options, env, self)
+      }
+    },
+  },
 
   themeConfig: {
     nav: navItems,
