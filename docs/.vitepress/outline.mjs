@@ -30,18 +30,17 @@ export const parts = [
         source: 'docs/part0-preface/chapter1/index.md',
         code: 'code/part0-preface/chapter1',
         title: '环境准备与验证',
-        summary: '本地文档预览、AI MAX 395 + ROCm 7.12.0 基线、最小环境验证',
+        summary: 'uv sync、AI MAX 395 + ROCm 7.12.0 基线、最小环境验证',
         status: '🚧',
-        lead: '本章先不深入讲 ROCm 软件栈原理，而是帮你用最短路径确认两件事：本地文档站点能打开，实验机上的 AMD GPU 环境能跑。读完后，你应该能判断自己的环境是否适合继续跟着后续章节做实验。',
+        lead: '本章先不深入讲 ROCm 软件栈原理，而是帮你用最短路径确认实验环境能不能继续往后跑。读完后，你应该能通过 uv sync 复现本篇环境，确认 ROCm 能看到 GPU，并完成 PyTorch ROCm 与最小 HIP 路径的基础验证。',
         sections: [
           ['本教程的实验基线', '明确所有实验默认在 AI MAX 395 + ROCm 7.12.0 上验证，其他设备只参考方法。'],
-          ['本地文档环境', '用 Node、npm 和 VitePress 在本地启动教程站点，方便边读边改。'],
-          ['实验机环境分工', '说明本地 Mac 负责 git 和写作，AMD-AIMAX395 只负责运行 ROCm / HIP / profiling 实验。'],
-          ['准备本篇 uv 环境', '使用项目 bootstrap 脚本创建独立 Python 环境，并理解每篇一个 venv 的约定。'],
+          ['同步本篇 uv 环境', '进入 code/part0-preface 后运行 uv sync，并使用 activate-rocm.sh 激活 ROCm wheel 环境。'],
           ['验证 GPU 可见性', '用 rocminfo 和 rocm-smi 检查 GPU、驱动、显存和运行状态。'],
           ['验证 PyTorch ROCm', '运行最小 PyTorch ROCm smoke test，确认框架能看到 GPU。'],
-          ['验证最小 HIP 程序', '跑通一个最小 GPU 程序，为后续 HIP kernel 实验做准备。'],
-          ['环境不通时先收集什么', '列出报错、版本、命令输出、硬件信息和日志，避免盲目排错。']
+          ['验证最小 HIP 程序', '直接用 hipcc 编译并运行最小 vector add 程序。'],
+          ['环境不通时先收集什么', '列出报错、版本、命令输出、硬件信息和日志，避免盲目排错。'],
+          ['附录 A：环境安装细节与常见坑', '解释 pyproject、AMD wheel 源、rocm-sdk init 和 ROCM_PATH 的关系。']
         ]
       }
     ]
@@ -709,25 +708,22 @@ export const chapters = numberedChapters()
 export const chapterCount = chapters.length
 export const bodyPartCount = parts.length - 1
 
-export const navItems = parts.map((part) => ({
-  text: part.navText,
-  link: part.chapters[0].path,
-}))
+export const navItems = [
+  { text: '首页', link: '/' },
+  { text: '全书目录', link: '/part0-preface/chapter0/' },
+  { text: '学习路线', link: '/part0-preface/chapter0/#_0-6-学习路线图' },
+  { text: '实验环境', link: '/part0-preface/chapter1/' },
+  { text: 'GitHub', link: 'https://github.com/Weihong-Liu/hello-ai-infra' },
+]
 
-export const sidebar = Object.fromEntries(
-  parts.map((part) => [
-    part.prefix,
-    [
-      {
-        text: part.title,
-        items: part.chapters.map((chapter) => {
-          const numbered = chapters.find((item) => item.path === chapter.path)
-          return {
-            text: `第 ${numbered.number} 章 ${chapter.title}`,
-            link: chapter.path,
-          }
-        }),
-      },
-    ],
-  ]),
-)
+export const sidebar = parts.map((part) => ({
+  text: part.readmeTitle,
+  collapsed: false,
+  items: part.chapters.map((chapter) => {
+    const numbered = chapters.find((item) => item.path === chapter.path)
+    return {
+      text: `第 ${numbered.number} 章 ${chapter.title}`,
+      link: chapter.path,
+    }
+  }),
+}))
