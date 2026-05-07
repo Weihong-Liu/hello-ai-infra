@@ -1,0 +1,34 @@
+[project]
+name = "part0-preface"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.4.4",
+    "rocm==7.12.0",
+    "rocm-sdk-core==7.12.0",
+    "rocm-sdk-devel==7.12.0",
+    "rocm-sdk-libraries-gfx1151==7.12.0",
+    "torch==2.9.1+rocm7.12.0",
+    "triton==3.5.1+rocm7.12.0",
+]
+
+[[tool.uv.index]]
+name = "rocm-amd"
+url = "https://repo.amd.com/rocm/whl/gfx1151/"
+explicit = true
+
+[[tool.uv.index]]
+name = "pypi-mirror"
+url = "https://mirrors.bfsu.edu.cn/pypi/web/simple"
+default = true
+
+[tool.uv.sources]
+rocm = { index = "rocm-amd" }
+rocm-sdk-core = { index = "rocm-amd" }
+rocm-sdk-devel = { index = "rocm-amd" }
+rocm-sdk-libraries = { index = "rocm-amd" }
+rocm-sdk-libraries-gfx1151 = { index = "rocm-amd" }
+rocm-core = { index = "rocm-amd" }
+rocm-smi-lib = { index = "rocm-amd" }
+torch = { index = "rocm-amd" }
+triton = { index = "rocm-amd" }
