@@ -35,7 +35,7 @@ https://weihong-liu.github.io/hello-ai-infra/
 | ---- | ---- | ---- |
 | **第 0 篇：前言与学习路线** | | |
 | [第 0 章 写给读者的话](https://github.com/Weihong-Liu/hello-ai-infra/blob/main/docs/part0-preface/chapter0/index.md) | AI Infra 的重要性、教程特色、学习路线 | 🚧 |
-| [第 1 章 环境准备与验证](https://github.com/Weihong-Liu/hello-ai-infra/blob/main/docs/part0-preface/chapter1/index.md) | 本地文档预览、AI MAX 395 + ROCm 7.12.0 基线、最小环境验证 | 🚧 |
+| [第 1 章 环境准备与验证](https://github.com/Weihong-Liu/hello-ai-infra/blob/main/docs/part0-preface/chapter1/index.md) | uv sync、AI MAX 395 + ROCm 7.12.0 基线、最小环境验证 | 🚧 |
 | **第 1 篇：AI Infra 全景与 AMD GPU 基础** | | |
 | [第 2 章 AI Infra 全景图](https://github.com/Weihong-Liu/hello-ai-infra/blob/main/docs/part1-hardware-rocm/chapter1/index.md) | 从模型到硬件的完整链路、HPOA 方法论 | 🚧 |
 | [第 3 章 AMD GPU 与 ROCm 软件栈](https://github.com/Weihong-Liu/hello-ai-infra/blob/main/docs/part1-hardware-rocm/chapter2/index.md) | AMD GPU 执行模型、ROCm 层次、上层框架关系 | 🚧 |
