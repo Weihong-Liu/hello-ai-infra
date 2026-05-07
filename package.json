@@ -8,6 +8,7 @@
     "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
+    "mermaid": "^11.14.0",
     "vitepress": "^2.0.0-alpha.16",
     "vue": "^3.5.0"
   },
