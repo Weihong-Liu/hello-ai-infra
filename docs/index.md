@@ -7,7 +7,7 @@ hero:
   actions:
     - theme: brand
       text: 开始学习
-      link: /part0-preface/chapter0/
+      link: /part0-preface/chapter1/
 
 features:
   - title: 🔧 AMD First

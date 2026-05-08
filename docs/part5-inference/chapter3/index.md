@@ -37,7 +37,7 @@ description: "Hello AI Infra 第22章 · Model Repository、Backend、HTTP / gRP
 
 - 本章目前是 Alpha 阶段的大纲骨架，正式正文会在对应实验跑通后补齐。
 - 涉及命令、输出或性能数字的内容，后续必须在 AI MAX 395 + ROCm 7.12.0 上实测。
-- 与本章相关的代码、日志和实验底稿会放在 `code/part5-inference/chapter18/`。
+- 与本章相关的代码、日志和实验底稿会放在 `code/part5-inference/chapter3/`。
 
 ## 延伸阅读
 
