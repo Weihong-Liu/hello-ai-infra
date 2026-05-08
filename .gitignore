@@ -7,3 +7,6 @@ reference_repositories/
 __pycache__/
 .env
 package-lock.json
+
+# WebP 由 scripts/png-to-webp.mjs 在构建时自动生成，不进仓库
+docs/**/images/**/*.webp
