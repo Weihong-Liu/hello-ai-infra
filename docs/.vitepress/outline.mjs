@@ -8,9 +8,9 @@ export const parts = [
     readmeTitle: '第 0 篇：前言与学习路线',
     chapters: [
       {
-        path: '/part0-preface/chapter0/',
-        source: 'docs/part0-preface/chapter0/index.md',
-        code: 'code/part0-preface/chapter0',
+        path: '/part0-preface/chapter1/',
+        source: 'docs/part0-preface/chapter1/index.md',
+        code: 'code/part0-preface/chapter1',
         title: '写给读者的话',
         summary: 'AI Infra 的重要性、教程特色、学习路线',
         status: '🚧',
@@ -26,9 +26,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part0-preface/chapter1/',
-        source: 'docs/part0-preface/chapter1/index.md',
-        code: 'code/part0-preface/chapter1',
+        path: '/part0-preface/chapter2/',
+        source: 'docs/part0-preface/chapter2/index.md',
+        code: 'code/part0-preface/chapter2',
         title: '环境准备与验证',
         summary: 'uv sync、AI MAX 395 + ROCm 7.12.0 基线、最小环境验证',
         status: '🚧',
@@ -64,6 +64,7 @@ export const parts = [
           ['AI Infra 的核心模块', '理解训练框架、推理引擎、算子库、编译器、profiling 和调度系统各自的位置。'],
           ['算子优化、推理优化、编译器优化分别解决什么问题', '区分三类优化的边界，避免把所有性能问题都归因于 kernel。'],
           ['AI Infra 工程师的核心能力模型', '总结硬件理解、性能分析、工程实现和实验复现四类能力。'],
+          ['拿到性能问题时先怎么分诊', '用一张决策图把常见性能现象导向服务、框架、算子、运行时或硬件层。'],
           ['本教程的学习闭环：理解 -> 测量 -> 优化 -> 自动化', '说明后续每一篇如何围绕同一个优化闭环推进。']
         ]
       },
@@ -94,12 +95,11 @@ export const parts = [
         status: '🚧',
         lead: '本章在已经验证环境可用的基础上，带你跑通第一个真正的 AMD GPU 程序。重点不是安装百科，而是建立后续实验都会复用的代码、计时和日志习惯。',
         sections: [
-          ['确认当前章节环境', '复用 Part 0 的环境基线，确认当前章节代码目录和运行环境已经就绪。'],
-          ['读取硬件信息', '用 rocminfo 和 rocm-smi 记录实验机器的关键上下文。'],
-          ['跑通 PyTorch ROCm', '运行最小 tensor 运算，确认 PyTorch 能把计算放到 AMD GPU 上。'],
+          ['从已经验证的 ROCm 环境开始', '复用第 1 章的环境验证结果，直接进入当前章节代码目录。'],
+          ['过一遍框架侧 smoke test', '运行一个 PyTorch ROCm tensor 运算，作为进入手写 HIP 程序前的热身。'],
           ['跑通第一个 HIP kernel', '编写、编译并运行一个最小 HIP kernel。'],
-          ['建立 baseline benchmark', '用固定输入、热身、重复运行和日志文件建立可复现的计时 baseline。'],
-          ['留下实验底稿', '说明代码、日志和 EXPERIMENT.md 应该如何对应。']
+          ['建立 baseline benchmark', '用固定输入、热身、重复运行和 GPU event 建立可复查的计时 baseline。'],
+          ['留下实验底稿', '说明源码、命令输出、benchmark 配置和 EXPERIMENT.md 应该如何对应。']
         ]
       }
     ]
@@ -111,9 +111,9 @@ export const parts = [
     readmeTitle: '第 2 篇：性能分析与瓶颈定位',
     chapters: [
       {
-        path: '/part2-profiling/chapter4/',
-        source: 'docs/part2-profiling/chapter4/index.md',
-        code: 'code/part2-profiling/chapter4',
+        path: '/part2-profiling/chapter1/',
+        source: 'docs/part2-profiling/chapter1/index.md',
+        code: 'code/part2-profiling/chapter1',
         title: '性能优化的基本方法论',
         summary: 'Latency、Throughput、Bandwidth、FLOPS、Roofline、可信 benchmark',
         status: '🚧',
@@ -128,9 +128,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part2-profiling/chapter5/',
-        source: 'docs/part2-profiling/chapter5/index.md',
-        code: 'code/part2-profiling/chapter5',
+        path: '/part2-profiling/chapter2/',
+        source: 'docs/part2-profiling/chapter2/index.md',
+        code: 'code/part2-profiling/chapter2',
         title: '用一个慢算子跑通 Profiling 闭环',
         summary: '同一案例贯穿 benchmark、rocprof、PyTorch Profiler、瓶颈判断',
         status: '🚧',
@@ -145,9 +145,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part2-profiling/chapter6/',
-        source: 'docs/part2-profiling/chapter6/index.md',
-        code: 'code/part2-profiling/chapter6',
+        path: '/part2-profiling/chapter3/',
+        source: 'docs/part2-profiling/chapter3/index.md',
+        code: 'code/part2-profiling/chapter3',
         title: '建立你的第一个性能分析报告',
         summary: '采集数据、判断瓶颈、提出假设、生成 Markdown 报告',
         status: '🚧',
@@ -162,9 +162,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part2-profiling/chapter7/',
-        source: 'docs/part2-profiling/chapter7/index.md',
-        code: 'code/part2-profiling/chapter7',
+        path: '/part2-profiling/chapter4/',
+        source: 'docs/part2-profiling/chapter4/index.md',
+        code: 'code/part2-profiling/chapter4',
         title: 'Omniperf 与硬件计数器进阶',
         summary: '用进阶计数器解释访存、Occupancy、波前行为和 Roofline 证据',
         status: '🚧',
@@ -187,9 +187,9 @@ export const parts = [
     readmeTitle: '第 3 篇：HIP 算子优化实战',
     chapters: [
       {
-        path: '/part3-hip-kernels/chapter7/',
-        source: 'docs/part3-hip-kernels/chapter7/index.md',
-        code: 'code/part3-hip-kernels/chapter7',
+        path: '/part3-hip-kernels/chapter1/',
+        source: 'docs/part3-hip-kernels/chapter1/index.md',
+        code: 'code/part3-hip-kernels/chapter1',
         title: 'HIP 编程基础',
         summary: 'Kernel、Thread、Block、Grid、Host / Device、内存管理',
         status: '🚧',
@@ -205,9 +205,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part3-hip-kernels/chapter8/',
-        source: 'docs/part3-hip-kernels/chapter8/index.md',
-        code: 'code/part3-hip-kernels/chapter8',
+        path: '/part3-hip-kernels/chapter2/',
+        source: 'docs/part3-hip-kernels/chapter2/index.md',
+        code: 'code/part3-hip-kernels/chapter2',
         title: '从 Vector Add 理解 GPU 并行',
         summary: 'CPU baseline、Naive HIP、线程映射、访存合并、benchmark',
         status: '🚧',
@@ -223,9 +223,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part3-hip-kernels/chapter9/',
-        source: 'docs/part3-hip-kernels/chapter9/index.md',
-        code: 'code/part3-hip-kernels/chapter9',
+        path: '/part3-hip-kernels/chapter3/',
+        source: 'docs/part3-hip-kernels/chapter3/index.md',
+        code: 'code/part3-hip-kernels/chapter3',
         title: 'Reduction 优化',
         summary: 'Naive Reduction、LDS、Wavefront、多阶段 Reduction、性能对比',
         status: '🚧',
@@ -241,9 +241,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part3-hip-kernels/chapter10/',
-        source: 'docs/part3-hip-kernels/chapter10/index.md',
-        code: 'code/part3-hip-kernels/chapter10',
+        path: '/part3-hip-kernels/chapter4/',
+        source: 'docs/part3-hip-kernels/chapter4/index.md',
+        code: 'code/part3-hip-kernels/chapter4',
         title: 'Softmax 优化',
         summary: '数值稳定性、访存优化、Block 级并行、PyTorch 对齐',
         status: '🚧',
@@ -259,9 +259,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part3-hip-kernels/chapter11/',
-        source: 'docs/part3-hip-kernels/chapter11/index.md',
-        code: 'code/part3-hip-kernels/chapter11',
+        path: '/part3-hip-kernels/chapter5/',
+        source: 'docs/part3-hip-kernels/chapter5/index.md',
+        code: 'code/part3-hip-kernels/chapter5',
         title: 'LayerNorm 优化',
         summary: '均值方差、Reduction + Normalize 融合、向量化读写、性能分析',
         status: '🚧',
@@ -276,9 +276,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part3-hip-kernels/chapter12/',
-        source: 'docs/part3-hip-kernels/chapter12/index.md',
-        code: 'code/part3-hip-kernels/chapter12',
+        path: '/part3-hip-kernels/chapter6/',
+        source: 'docs/part3-hip-kernels/chapter6/index.md',
+        code: 'code/part3-hip-kernels/chapter6',
         title: 'Matmul 入门优化',
         summary: 'Naive GEMM、Tiling、LDS 缓存、Register Blocking、rocBLAS 差距观察',
         status: '🚧',
@@ -303,9 +303,9 @@ export const parts = [
     readmeTitle: '第 4 篇：Triton on AMD 与自动调参',
     chapters: [
       {
-        path: '/part4-triton/chapter13/',
-        source: 'docs/part4-triton/chapter13/index.md',
-        code: 'code/part4-triton/chapter13',
+        path: '/part4-triton/chapter1/',
+        source: 'docs/part4-triton/chapter1/index.md',
+        code: 'code/part4-triton/chapter1',
         title: 'Triton 编程模型',
         summary: 'Triton vs HIP、program model、block 级张量、AMD 环境验证',
         status: '🚧',
@@ -319,9 +319,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part4-triton/chapter14/',
-        source: 'docs/part4-triton/chapter14/index.md',
-        code: 'code/part4-triton/chapter14',
+        path: '/part4-triton/chapter2/',
+        source: 'docs/part4-triton/chapter2/index.md',
+        code: 'code/part4-triton/chapter2',
         title: 'Triton Matmul 优化',
         summary: 'Triton GEMM、tile 设计、数据复用、benchmark、HIP / rocBLAS 对比',
         status: '🚧',
@@ -337,9 +337,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part4-triton/chapter15/',
-        source: 'docs/part4-triton/chapter15/index.md',
-        code: 'code/part4-triton/chapter15',
+        path: '/part4-triton/chapter3/',
+        source: 'docs/part4-triton/chapter3/index.md',
+        code: 'code/part4-triton/chapter3',
         title: 'Triton Softmax 优化',
         summary: '行级 Softmax、数值稳定、block reduction、访存优化、PyTorch 对齐',
         status: '🚧',
@@ -355,9 +355,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part4-triton/chapter16/',
-        source: 'docs/part4-triton/chapter16/index.md',
-        code: 'code/part4-triton/chapter16',
+        path: '/part4-triton/chapter4/',
+        source: 'docs/part4-triton/chapter4/index.md',
+        code: 'code/part4-triton/chapter4',
         title: 'Triton Attention 优化',
         summary: 'QK^T、Softmax、PV、分块注意力、显存访问、可复现实验边界',
         status: '🚧',
@@ -373,9 +373,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part4-triton/chapter17/',
-        source: 'docs/part4-triton/chapter17/index.md',
-        code: 'code/part4-triton/chapter17',
+        path: '/part4-triton/chapter5/',
+        source: 'docs/part4-triton/chapter5/index.md',
+        code: 'code/part4-triton/chapter5',
         title: 'Triton 自动调参',
         summary: '搜索空间、autotune、自动 benchmark、选择最优 kernel config',
         status: '🚧',
@@ -398,9 +398,9 @@ export const parts = [
     readmeTitle: '第 5 篇：推理优化与模型部署',
     chapters: [
       {
-        path: '/part5-inference/chapter16/',
-        source: 'docs/part5-inference/chapter16/index.md',
-        code: 'code/part5-inference/chapter16',
+        path: '/part5-inference/chapter1/',
+        source: 'docs/part5-inference/chapter1/index.md',
+        code: 'code/part5-inference/chapter1',
         title: '推理优化全景',
         summary: '延迟、吞吐、精度、batch、并发、端到端 pipeline',
         status: '🚧',
@@ -415,9 +415,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part5-inference/chapter17/',
-        source: 'docs/part5-inference/chapter17/index.md',
-        code: 'code/part5-inference/chapter17',
+        path: '/part5-inference/chapter2/',
+        source: 'docs/part5-inference/chapter2/index.md',
+        code: 'code/part5-inference/chapter2',
         title: 'ONNX Runtime / MIGraphX 工具实战',
         summary: 'ONNX 导出、ROCm 推理、MIGraphX 运行、工具层性能对比',
         status: '🚧',
@@ -432,9 +432,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part5-inference/chapter18/',
-        source: 'docs/part5-inference/chapter18/index.md',
-        code: 'code/part5-inference/chapter18',
+        path: '/part5-inference/chapter3/',
+        source: 'docs/part5-inference/chapter3/index.md',
+        code: 'code/part5-inference/chapter3',
         title: 'Triton Inference Server on AMD',
         summary: 'Model Repository、Backend、HTTP / gRPC、动态 batching、端到端测试',
         status: '🚧',
@@ -449,9 +449,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part5-inference/chapter19/',
-        source: 'docs/part5-inference/chapter19/index.md',
-        code: 'code/part5-inference/chapter19',
+        path: '/part5-inference/chapter4/',
+        source: 'docs/part5-inference/chapter4/index.md',
+        code: 'code/part5-inference/chapter4',
         title: 'YOLO 推理优化案例',
         summary: '图像预处理、NMS、batch 推理、pipeline profiling、性能报告',
         status: '🚧',
@@ -466,9 +466,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part5-inference/chapter20/',
-        source: 'docs/part5-inference/chapter20/index.md',
-        code: 'code/part5-inference/chapter20',
+        path: '/part5-inference/chapter5/',
+        source: 'docs/part5-inference/chapter5/index.md',
+        code: 'code/part5-inference/chapter5',
         title: 'LLM 推理性能分析入门',
         summary: 'Prefill、Decode、TTFT、TPOT、KV Cache、显存观测、batch / 并发',
         status: '🚧',
@@ -492,9 +492,9 @@ export const parts = [
     readmeTitle: '第 6 篇：AI 编译器与自动调优',
     chapters: [
       {
-        path: '/part6-compiler/chapter21/',
-        source: 'docs/part6-compiler/chapter21/index.md',
-        code: 'code/part6-compiler/chapter21',
+        path: '/part6-compiler/chapter1/',
+        source: 'docs/part6-compiler/chapter1/index.md',
+        code: 'code/part6-compiler/chapter1',
         title: 'AI 编译器到底在优化什么',
         summary: '模型图、计算图、算子、kernel、ISA、手写优化关系',
         status: '🚧',
@@ -508,9 +508,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part6-compiler/chapter22/',
-        source: 'docs/part6-compiler/chapter22/index.md',
-        code: 'code/part6-compiler/chapter22',
+        path: '/part6-compiler/chapter2/',
+        source: 'docs/part6-compiler/chapter2/index.md',
+        code: 'code/part6-compiler/chapter2',
         title: '图优化原理基础',
         summary: '算子融合、常量折叠、死代码消除、布局优化、Memory Planning 原理',
         status: '🚧',
@@ -525,9 +525,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part6-compiler/chapter23/',
-        source: 'docs/part6-compiler/chapter23/index.md',
-        code: 'code/part6-compiler/chapter23',
+        path: '/part6-compiler/chapter3/',
+        source: 'docs/part6-compiler/chapter3/index.md',
+        code: 'code/part6-compiler/chapter3',
         title: 'Kernel 生成与调度搜索',
         summary: 'Schedule 原语、搜索空间、Cost Model、AutoScheduler、硬件反馈',
         status: '🚧',
@@ -542,9 +542,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part6-compiler/chapter24/',
-        source: 'docs/part6-compiler/chapter24/index.md',
-        code: 'code/part6-compiler/chapter24',
+        path: '/part6-compiler/chapter4/',
+        source: 'docs/part6-compiler/chapter4/index.md',
+        code: 'code/part6-compiler/chapter4',
         title: 'TVM / Triton / MIGraphX 对比',
         summary: '三个工具的定位、适用问题和选择指南',
         status: '🚧',
@@ -566,9 +566,9 @@ export const parts = [
     readmeTitle: '第 7 篇：AutoInfra Agent 自动优化系统',
     chapters: [
       {
-        path: '/part7-agent/chapter25/',
-        source: 'docs/part7-agent/chapter25/index.md',
-        code: 'code/part7-agent/chapter25',
+        path: '/part7-agent/chapter1/',
+        source: 'docs/part7-agent/chapter1/index.md',
+        code: 'code/part7-agent/chapter1',
         title: '为什么 AI Infra 需要 Agent',
         summary: '人类优化流程、可自动化环节、LLM 角色、AutoInfra 总架构',
         status: '🚧',
@@ -582,9 +582,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part7-agent/chapter26/',
-        source: 'docs/part7-agent/chapter26/index.md',
-        code: 'code/part7-agent/chapter26',
+        path: '/part7-agent/chapter2/',
+        source: 'docs/part7-agent/chapter2/index.md',
+        code: 'code/part7-agent/chapter2',
         title: '实验资产与数据结构',
         summary: '硬件画像、实验配置、benchmark 结果、profiling 输出、报告数据模型',
         status: '🚧',
@@ -598,9 +598,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part7-agent/chapter27/',
-        source: 'docs/part7-agent/chapter27/index.md',
-        code: 'code/part7-agent/chapter27',
+        path: '/part7-agent/chapter3/',
+        source: 'docs/part7-agent/chapter3/index.md',
+        code: 'code/part7-agent/chapter3',
         title: '自动 Benchmark 与 Profiling 数据管线',
         summary: '自动运行 benchmark、调用 profiling、保存结果、对比版本',
         status: '🚧',
@@ -614,9 +614,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part7-agent/chapter28/',
-        source: 'docs/part7-agent/chapter28/index.md',
-        code: 'code/part7-agent/chapter28',
+        path: '/part7-agent/chapter4/',
+        source: 'docs/part7-agent/chapter4/index.md',
+        code: 'code/part7-agent/chapter4',
         title: '瓶颈判断与优化计划',
         summary: 'Memory-bound / Compute-bound 判断、优化候选、优先级排序、实验计划',
         status: '🚧',
@@ -630,9 +630,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part7-agent/chapter29/',
-        source: 'docs/part7-agent/chapter29/index.md',
-        code: 'code/part7-agent/chapter29',
+        path: '/part7-agent/chapter5/',
+        source: 'docs/part7-agent/chapter5/index.md',
+        code: 'code/part7-agent/chapter5',
         title: '代码修改、运行与回滚',
         summary: '生成候选代码、自动插入 benchmark、检查编译错误、失败回滚',
         status: '🚧',
@@ -646,9 +646,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part7-agent/chapter30/',
-        source: 'docs/part7-agent/chapter30/index.md',
-        code: 'code/part7-agent/chapter30',
+        path: '/part7-agent/chapter6/',
+        source: 'docs/part7-agent/chapter6/index.md',
+        code: 'code/part7-agent/chapter6',
         title: '报告生成与实验追踪',
         summary: 'before / after 表格、失败尝试、证据链、下一步优化方向',
         status: '🚧',
@@ -662,9 +662,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part7-agent/chapter31/',
-        source: 'docs/part7-agent/chapter31/index.md',
-        code: 'code/part7-agent/chapter31',
+        path: '/part7-agent/chapter7/',
+        source: 'docs/part7-agent/chapter7/index.md',
+        code: 'code/part7-agent/chapter7',
         title: '最小 AutoInfra Agent 系统',
         summary: '把硬件采集、benchmark、profiling、计划、执行和报告串成闭环',
         status: '🚧',
@@ -678,9 +678,9 @@ export const parts = [
         ]
       },
       {
-        path: '/part7-agent/chapter32/',
-        source: 'docs/part7-agent/chapter32/index.md',
-        code: 'code/part7-agent/chapter32',
+        path: '/part7-agent/chapter8/',
+        source: 'docs/part7-agent/chapter8/index.md',
+        code: 'code/part7-agent/chapter8',
         title: '毕业项目：AutoInfra Agent 完整案例',
         summary: '完整系统、Triton Softmax、YOLO pipeline、AMD GPU 性能诊断报告',
         status: '🚧',
@@ -710,9 +710,9 @@ export const bodyPartCount = parts.length - 1
 
 export const navItems = [
   { text: '首页', link: '/' },
-  { text: '全书目录', link: '/part0-preface/chapter0/' },
-  { text: '学习路线', link: '/part0-preface/chapter0/#_0-6-学习路线图' },
-  { text: '实验环境', link: '/part0-preface/chapter1/' },
+  { text: '全书目录', link: '/part0-preface/chapter1/' },
+  { text: '学习路线', link: '/part0-preface/chapter1/#_0-6-学习路线图' },
+  { text: '实验环境', link: '/part0-preface/chapter2/' },
   { text: 'GitHub', link: 'https://github.com/Weihong-Liu/hello-ai-infra' },
 ]
 
