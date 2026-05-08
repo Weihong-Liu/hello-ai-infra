@@ -29,6 +29,29 @@ export default defineConfig({
 
         return fence(tokens, idx, options, env, self)
       }
+
+      // Rewrite ![](*.png) → ![](*.webp) at render time so authors keep
+      // editing PNG locally while the built site serves WebP.
+      const defaultImage =
+        md.renderer.rules.image ||
+        ((tokens, idx, options, env, self) => self.renderToken(tokens, idx, options))
+      md.renderer.rules.image = (tokens, idx, options, env, self) => {
+        const token = tokens[idx]
+        const srcIndex = token.attrIndex('src')
+        if (srcIndex >= 0) {
+          const src = token.attrs![srcIndex][1]
+          if (/\.png(\?.*)?$/i.test(src)) {
+            token.attrs![srcIndex][1] = src.replace(/\.png(\?.*)?$/i, (_, q) => `.webp${q ?? ''}`)
+          }
+        }
+        if (token.attrIndex('loading') < 0) {
+          token.attrSet('loading', 'lazy')
+        }
+        if (token.attrIndex('decoding') < 0) {
+          token.attrSet('decoding', 'async')
+        }
+        return defaultImage(tokens, idx, options, env, self)
+      }
     },
   },
 

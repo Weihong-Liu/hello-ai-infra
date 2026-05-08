@@ -3,14 +3,18 @@
   "scripts": {
     "docs:sync-outline": "node docs/.vitepress/sync-outline.mjs",
     "docs:check-outline": "node docs/.vitepress/sync-outline.mjs --check",
-    "docs:dev": "npm run docs:sync-outline && vitepress dev docs",
-    "docs:build": "npm run docs:sync-outline && vitepress build docs",
+    "docs:build-images": "node scripts/png-to-webp.mjs",
+    "docs:dev": "npm run docs:sync-outline && npm run docs:build-images && vitepress dev docs",
+    "docs:build": "npm run docs:sync-outline && npm run docs:build-images && vitepress build docs",
     "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
     "mermaid": "^11.14.0",
     "vitepress": "^2.0.0-alpha.16",
     "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "sharp": "^0.33.5"
   },
   "engines": {
     "node": ">= 18.0.0"
