@@ -1,625 +1,258 @@
 ---
-title: "第1章 环境准备与验证"
-description: "Hello AI Infra 第1章 · uv sync、AI MAX 395 + ROCm 7.12.0 基线、最小环境验证"
+title: "第0章 写给读者的话"
+description: "Hello AI Infra 第0章 · AI Infra 的重要性、教程特色、学习路线"
 ---
 
-# 第1章 环境准备与验证
+# 第0章 写给读者的话
 
 ## 本章导读
 
-> 把这一章想象成一张「开工前体检表」就好。你**不必**在这里搞懂 ROCm、HIP、uv 的所有原理——那是后面章节的事。这一章只做一件事：让你有底气回答三个问题。ROCm 能不能看到 GPU？PyTorch 能不能用上 GPU？最小 HIP 程序能不能编译运行？三个都过了，基础链路就打通了；万一哪个过不去，我们也准备了排错指南，帮你用最快速度把问题定位出来。
+> 欢迎你，未来的 AI Infra 构建者！这一章不写代码，也不急着抛 GPU 术语。我们先坐下来聊清楚三件事：AI Infra 到底在解决什么问题？这本教程打算怎样带你学？以及，为什么后面所有章节都围着「硬件、测量、优化、自动化」这八个字转？读完这一章，希望你不仅能判断这本教程适不适合自己，更能在心里搭起一张 AI Infra 的"全景地图"——后面每一站会走到哪儿，心里大致有数。
 
-本章对应代码在:
+## 0.1 为什么 AI Infra 很重要
 
-```text
-code/part0-preface/
-├── pyproject.toml
-├── uv.lock
-├── activate-rocm.sh
-└── chapter1/
-    ├── check_torch_rocm.py
-    └── vector_add.hip
-```
+我们先从一个你很可能会遇到的场景开始。
 
-## 1.1 本教程的实验基线
+你写了一个推理脚本，在自己的机器上跑得好好的。后来把它搬到另一台机器——模型没换，输入也差不多，延迟却明显高了一截。打开监控，GPU 好像也在工作；调一调 batch size，吞吐有时变好、有时变差；换一个推理引擎，有的模型收益肉眼可见，有的几乎纹丝不动。
 
-本章不打算做"安装百科"，也不会覆盖所有 AMD GPU 和系统组合——真要写成那样，恐怕这一章就得比整本教程还厚。它只回答一个问题：**当前环境，够不够支撑你继续往后学？**
+到这一步，你心里大概已经冒出一个念头：**问题已经不是"会不会调用模型"了**。真正让人头疼的，是下面这一连串没人能一句话说清的疑问：
 
-你可以把这一章想成三道门，必须依次推开，一道都跳不过去：
+- 这次请求究竟经过了哪些系统层次？
+- 时间花在模型计算、数据搬运、前后处理，还是服务框架上？
+- GPU 上真正执行的是哪些 kernel？
+- 当前瓶颈是访存、计算、调度，还是 batch / 并发策略？
+- 你做的改动，到底是真的更快了，还是只是测量方式变了？
 
-| 门 | 验证什么 | 推开之后说明 |
-| ---- | ---- | ---- |
-| 第一道门 | ROCm 能看到 GPU | 底层驱动和运行时基本可用 |
-| 第二道门 | PyTorch ROCm | 框架层能把计算放到 AMD GPU 上 |
-| 第三道门 | 最小 HIP 程序 | 后续手写 kernel 的路径基本打通 |
+这些问题，全都落在 **AI Infra** 的范围里。它们不是"调一调参数就能搞定"的问题，而是需要你走到框架底下、走到运行时里面、甚至走到硬件执行那一层去，才能看清全貌。
 
-本章使用的基线如下：
+如果一定要给一个简短的定义，可以这样说：**AI Infra 是让 AI 模型高效、稳定、可复现地运行起来的那一整套工程能力**。它把模型、框架、算子、编译器、运行时、硬件和服务系统串成一条完整的链路。只盯着其中一层，往往看不清完整问题——就像你不可能只盯着发动机的某一个零件就判断整辆车为什么跑不快一样。
 
-| 项目 | 基线 |
-| ---- | ---- |
-| 硬件 | AI MAX 395 |
-| GPU 架构 | gfx1151 |
-| ROCm 版本 | 7.12.0 |
-| Python 环境管理 | uv |
-| ROCm Python 包来源 | AMD gfx1151 wheel 源 |
-
-如果你的硬件或 ROCm 版本和上面对不上，不用担心——验证顺序仍然可以照搬，只是包版本、设备名、工具输出会有差异，到时候自己对照一下就好。
-
-## 1.2 同步本篇 uv 环境
-
-开始之前，先把代码目录切过来：
-
-```bash
-cd code/part0-preface
-```
-
-依赖已经写好在 `pyproject.toml` 和 `uv.lock` 里，你**不用手动 `uv add` 一堆包**。一条命令就够了：
-
-```bash
-uv sync
-```
-
-<details>
-<summary>输出：uv sync 创建本篇环境</summary>
-
-```text
-Using CPython 3.12.12
-Creating virtual environment at: .venv
-Resolved 17 packages in 0.61ms
-Installed 16 packages in 123ms
- + filelock==3.20.3
- + fsspec==2026.2.0
- + jinja2==3.1.6
- + markupsafe==3.0.3
- + mpmath==1.3.0
- + networkx==3.6.1
- + numpy==2.4.4
- + rocm==7.12.0
- + rocm-sdk-core==7.12.0
- + rocm-sdk-devel==7.12.0
- + rocm-sdk-libraries-gfx1151==7.12.0
- + setuptools==82.0.0
- + sympy==1.14.0
- + torch==2.9.1+rocm7.12.0
- + triton==3.5.1+rocm7.12.0
- + typing-extensions==4.15.0
-```
-
-</details>
-
-同步完成后，激活本篇环境：
-
-```bash
-source ./activate-rocm.sh
-```
-
-<details>
-<summary>输出：激活 ROCm uv 环境</summary>
-
-```text
-Activated ROCm uv environment:
-  PROJECT:    hello-ai-infra/code/part0-preface
-  VENV:       hello-ai-infra/code/part0-preface/.venv
-  ROCM_PATH:  hello-ai-infra/code/part0-preface/.venv/lib/python3.12/site-packages/_rocm_sdk_devel
-  Python:     hello-ai-infra/code/part0-preface/.venv/bin/python
-Python 3.12.12
-```
-
-</details>
-
-输出里**最关键的一行**是 `ROCM_PATH` 指向 `_rocm_sdk_devel`。如果你看到的是 `_rocm_sdk_core`，后面编译 HIP 程序时十有八九会撞上 `cannot find ROCm device library` 这个报错。别慌，这是 ROCm wheel 安装的一个"老熟人级"的坑，原因和处理方式我们留到本章附录里仔细讲。
-
-## 1.3 验证 GPU 可见性
-
-第一道门：ROCm 能不能看到 GPU。
-
-先用 `rocminfo` 摸一摸你的 GPU：
-
-```bash
-rocminfo | grep -E "^[[:space:]]*(Name|Marketing Name|Vendor Name|Device Type|Uuid):|gfx1151" | head -40
-```
-
-<details>
-<summary>输出：rocminfo 识别到 gfx1151 GPU</summary>
-
-```text
-  Name:                    AMD RYZEN AI MAX+ 395 w/ Radeon 8060S
-  Uuid:                    CPU-XX
-  Marketing Name:          AMD RYZEN AI MAX+ 395 w/ Radeon 8060S
-  Vendor Name:             CPU
-  Device Type:             CPU
-  Name:                    gfx1151
-  Uuid:                    GPU-XX
-  Marketing Name:          Radeon 8060S Graphics
-  Vendor Name:             AMD
-  Device Type:             GPU
-      Name:                    amdgcn-amd-amdhsa--gfx1151
-      Name:                    amdgcn-amd-amdhsa--gfx11-generic
-```
-
-</details>
-
-关键看两点：`Device Type: GPU` 必须出现，并且架构是 `gfx1151`。两条都对上了，说明驱动认得你的卡——第一道门已经推开一半了。
-
-再用 `rocm-smi` 看一眼 GPU 的运行状态：
-
-```bash
-rocm-smi
-```
-
-<details>
-<summary>输出：rocm-smi 能读取 GPU 状态</summary>
-
-```text
-======================================== ROCm System Management Interface ========================================
-================================================== Concise Info ==================================================
-Device  Node  IDs              Temp    Power     Partitions          SCLK  MCLK  Fan  Perf  PwrCap  VRAM%  GPU%
-              (DID,     GUID)  (Edge)  (Socket)  (Mem, Compute, ID)
-==================================================================================================================
-0       1     0x1586,   40101  27.0°C  12.046W   N/A, N/A, 0         N/A   N/A   0%   auto  N/A     71%    0%
-==================================================================================================================
-============================================== End of ROCm SMI Log ===============================================
-```
-
-</details>
-
-**如果这一步失败了，请先不要急着去跑 PyTorch、HIP 或 Triton**。上层框架全都建在底层驱动和运行时之上——底层不通，上层抛出来的错通常只会更让你迷惑。先回到驱动安装和 ROCm 官方文档去排查，确认 `rocminfo` 能看到 GPU 之后再继续。
-
-## 1.4 验证 PyTorch ROCm
-
-第二道门：框架层能不能真的把计算放到 AMD GPU 上。
-
-先看检查脚本:
-
-<details>
-<summary>代码：check_torch_rocm.py</summary>
-
-```python
-import platform
-
-import torch
-
-print(f"python: {platform.python_version()}")
-print(f"torch: {torch.__version__}")
-print(f"cuda_available: {torch.cuda.is_available()}")
-
-if not torch.cuda.is_available():
-    raise SystemExit("PyTorch ROCm backend is not available")
-
-print(f"device_count: {torch.cuda.device_count()}")
-print(f"device_name: {torch.cuda.get_device_name(0)}")
-
-x = torch.randn(1024, 1024, device="cuda")
-y = x @ x
-
-print(f"result_shape: {tuple(y.shape)}")
-print(f"result_dtype: {y.dtype}")
-print(f"result_device: {y.device}")
-print(f"result_checksum: {y.sum().item():.6f}")
-```
-
-</details>
-
-这个脚本做了三件事：导入 PyTorch、检查 GPU 后端、在 GPU 上跑一次 `1024 × 1024` 矩阵乘。简单到不能再简单——但验证环境时，**越简单越好**。复杂的例子只会让排查时变量更多、更乱。
-
-运行：
-
-```bash
-python chapter1/check_torch_rocm.py
-```
-
-<details>
-<summary>输出：PyTorch ROCm smoke test</summary>
-
-```text
-python: 3.12.12
-torch: 2.9.1+rocm7.12.0
-cuda_available: True
-device_count: 1
-device_name: Radeon 8060S Graphics
-result_shape: (1024, 1024)
-result_dtype: torch.float32
-result_device: cuda:0
-result_checksum: 89723.382812
-```
-
-</details>
-
-这里有个**几乎每个新手都会问的问题**：为什么 ROCm 版 PyTorch 里到处都是 `cuda`？答案是历史包袱——PyTorch 的设备字符串一直沿用 `cuda` 这个名字，没有为 ROCm 单独开一条。看到 `device="cuda"` 不代表你跑在 NVIDIA 卡上，把它读作"把 tensor 放到当前可用的 GPU 后端"就行。第二道门推开之后，这个命名的小别扭很快就会被你忘掉。
-
-这一步过了，至少说明三件事：
-
-| 检查项 | 通过后说明什么 |
-| ---- | ---- |
-| `import torch` 成功 | Python 环境里的 PyTorch 可用 |
-| `cuda_available: True` | PyTorch 能看到 GPU 后端 |
-| 矩阵乘完成 | 基础 GPU 计算路径可用 |
-
-## 1.5 验证最小 HIP 程序
-
-第三道门：你后续手写 kernel 的那条路有没有打通。
-
-PyTorch 跑通只能证明框架层 OK；要真正走到 GPU 编程，还得能把一段 HIP C++ 编译、加载、跑起来。这里**不要求你立刻理解 HIP 的所有细节**——那是第 3 篇的事情。现在你只需要知道一个最小 HIP 程序的骨架长什么样：
+一个模型请求大致会经过这样的路径：
 
 ```mermaid
 flowchart TD
-    A[Host 准备输入] --> B[Device 分配显存]
-    B --> C[Host 到 Device 拷贝]
-    C --> D[启动 HIP Kernel]
-    D --> E[Device 到 Host 拷贝]
-    E --> F[检查结果]
-    F --> G[释放资源]
+    A[输入请求] --> B[预处理]
+    B --> C[模型框架]
+    C --> D[计算图 / 算子]
+    D --> E[Kernel / 算子库]
+    E --> F[运行时 / 驱动]
+    F --> G[GPU 硬件执行]
+    G --> H[后处理]
+    H --> I[输出结果]
+
+    P[Profiling 数据] -.-> C
+    P -.-> D
+    P -.-> E
+    P -.-> G
 ```
 
 <div align="center">
-  <p>图 1.1 最小 HIP 程序的基本路径</p>
+  <p>图 0.1 一次推理请求从输入到 GPU 执行再到输出的简化路径</p>
 </div>
 
-如图 1.1 所示，这是几乎所有 HIP / CUDA 程序的最小骨架——分配显存、拷数据、起 kernel、拷回结果、校验、释放。后面写更复杂的算子时，外壳依然是这个样子，变的只是 kernel 内部那几行。把这个骨架刻在脑子里，后面学起来会轻松很多。
+如图 0.1 所示，只盯着最上面一层，你大概会得出"模型慢"的结论；只盯着最下面一层，又会觉得"所有问题都得手写 kernel"。真正的 AI Infra 学习，是在这些层之间来回穿梭：**先弄清问题落在哪一层，再决定该掏出哪一把工具**。
 
-下面是本章用到的 HIP 文件：
+所以这本教程不会停在"怎么运行某个工具"上。我们更关心的是：这个工具到底帮你回答了什么问题？它给出的证据，撑不撑得起你的优化判断？——换个说法，我们教的是"诊断学"，而不只是"药方大全"。
 
-<details>
-<summary>代码：vector_add.hip</summary>
+## 0.2 AI Infra 到底包括什么
 
-```cpp
-#include <hip/hip_runtime.h>
+这一节先递给你一张地图。第一次读不需要记住所有名词——知道它们各自待在系统的哪个位置就够了。就像你第一次看地铁线路图，不用背下每一站的换乘口，但得知道哪条线通哪个方向。
 
-#include <cmath>
-#include <iostream>
-#include <vector>
-
-#define HIP_CHECK(call)                                                     \
-  do {                                                                      \
-    hipError_t err = call;                                                  \
-    if (err != hipSuccess) {                                                \
-      std::cerr << "HIP error: " << hipGetErrorString(err) << std::endl;   \
-      return 1;                                                             \
-    }                                                                       \
-  } while (0)
-
-__global__ void vector_add(const float* a, const float* b, float* c, int n) {
-  int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (idx < n) {
-    c[idx] = a[idx] + b[idx];
-  }
-}
-
-int main() {
-  const int n = 1 << 20;
-  const size_t bytes = n * sizeof(float);
-
-  std::vector<float> h_a(n, 1.0f);
-  std::vector<float> h_b(n, 2.0f);
-  std::vector<float> h_c(n, 0.0f);
-
-  float* d_a = nullptr;
-  float* d_b = nullptr;
-  float* d_c = nullptr;
-
-  HIP_CHECK(hipMalloc(&d_a, bytes));
-  HIP_CHECK(hipMalloc(&d_b, bytes));
-  HIP_CHECK(hipMalloc(&d_c, bytes));
-
-  HIP_CHECK(hipMemcpy(d_a, h_a.data(), bytes, hipMemcpyHostToDevice));
-  HIP_CHECK(hipMemcpy(d_b, h_b.data(), bytes, hipMemcpyHostToDevice));
-
-  const int threads = 256;
-  const int blocks = (n + threads - 1) / threads;
-  vector_add<<<blocks, threads>>>(d_a, d_b, d_c, n);
-  HIP_CHECK(hipGetLastError());
-  HIP_CHECK(hipDeviceSynchronize());
-
-  HIP_CHECK(hipMemcpy(h_c.data(), d_c, bytes, hipMemcpyDeviceToHost));
-
-  float max_error = 0.0f;
-  for (int i = 0; i < n; ++i) {
-    max_error = std::max(max_error, std::abs(h_c[i] - 3.0f));
-  }
-
-  hipDeviceProp_t prop{};
-  HIP_CHECK(hipGetDeviceProperties(&prop, 0));
-
-  std::cout << "device_name: " << prop.name << std::endl;
-  std::cout << "vector_size: " << n << std::endl;
-  std::cout << "blocks: " << blocks << std::endl;
-  std::cout << "threads_per_block: " << threads << std::endl;
-  std::cout << "max_error: " << max_error << std::endl;
-  std::cout << "status: " << (max_error == 0.0f ? "PASS" : "FAIL") << std::endl;
-
-  HIP_CHECK(hipFree(d_a));
-  HIP_CHECK(hipFree(d_b));
-  HIP_CHECK(hipFree(d_c));
-
-  return max_error == 0.0f ? 0 : 1;
-}
-```
-
-</details>
-
-先确认一下 `hipcc` 版本——这个命令顺带还能验证编译器路径是否在 `_rocm_sdk_devel` 下面：
-
-```bash
-hipcc --version
-```
-
-<details>
-<summary>输出：HIP 编译器版本</summary>
-
-```text
-HIP version: 7.12.60610-2bd1678d3d
-AMD clang version 22.0.0git (https://github.com/ROCm/llvm-project.git c849bc16b0e49951d313756f20b73c2b28d321d7+PATCHED:9a6ac45c97a1e511db838c5b46257324d2de1780)
-Target: x86_64-unknown-linux-gnu
-Thread model: posix
-InstalledDir: hello-ai-infra/code/part0-preface/.venv/lib/python3.12/site-packages/_rocm_sdk_devel/lib/llvm/bin
-```
-
-</details>
-
-然后编译 HIP 程序——这一步检验的是 HIP 编译器能不能找到你的 GPU 对应的 device library：
-
-```bash
-cd chapter1
-hipcc vector_add.hip -O2 -o vector_add && echo "compile_status: PASS"
-```
-
-<details>
-<summary>输出：HIP 程序编译</summary>
-
-```text
-compile_status: PASS
-```
-
-</details>
-
-运行程序：
-
-```bash
-./vector_add
-```
-
-<details>
-<summary>输出：vector add 运行结果</summary>
-
-```text
-device_name: Radeon 8060S Graphics
-vector_size: 1048576
-blocks: 4096
-threads_per_block: 256
-max_error: 0
-status: PASS
-```
-
-</details>
-
-看到 `status: PASS` 那一刻，意味着这条链路已经全部接通：HIP 编译器认识你的 GPU、device library 找得到、kernel 顺利启动、Host 与 Device 之间的数据拷贝正常、结果校验通过。三道门全部推开——恭喜你，正式具备继续往后学的条件了。后面章节的每一行代码，都建立在这三道门的基础之上。
-
-## 1.6 环境不通时先收集什么
-
-环境问题最容易让人焦虑——这一点我们都经历过。但**最糟糕的排错方式是只说一句"跑不通"**。无论求助对象是助教、社区，还是几小时之后冷静下来的你自己，你都需要把模糊的"不行"翻译成别人能判断的具体信息。
-
-一个像样的排错请求，至少需要包含下面这些信息：
-
-| 信息 | 示例 | 为什么重要 |
+| 模块 | 你可以先这样理解 | 后续会在哪里学 |
 | ---- | ---- | ---- |
-| 机器信息 | AI MAX 395 / ROCm 7.12.0 | 明确硬件和软件背景 |
-| 目录 | `hello-ai-infra/code/part0-preface` | 排查路径和环境变量问题 |
-| 环境 | `source ./activate-rocm.sh` 后运行 | 判断 venv 是否正确激活 |
-| 命令 | `python chapter1/check_torch_rocm.py` | 方便别人复现 |
-| 期望 | PyTorch 能看到 GPU 并完成矩阵乘 | 明确你认为应该发生什么 |
-| 实际 | 完整报错输出 | 保留关键证据 |
-| 最近改动 | 刚执行过 `uv sync` | 排查环境变化来源 |
+| 框架 | 负责表达模型、调度算子、管理张量 | 第 1 篇、第 5 篇 |
+| 算子 / Kernel | 真正在 GPU 上执行的计算单元 | 第 3 篇、第 4 篇 |
+| Profiling / Benchmark | 用数据回答“慢在哪里” | 第 2 篇 |
+| 推理引擎 / 服务 | 把模型放进端到端请求链路 | 第 5 篇 |
+| AI 编译器 | 自动做图优化、调度搜索、代码生成 | 第 6 篇 |
+| Agent 自动化 | 把测量、分析、修改、报告串成闭环 | 第 7 篇 |
 
-保存输出最省事的办法是用 `tee`——既能让你看到屏幕输出，也能同时留下一份完整日志：
+这些模块不是孤立的，它们之间的关系比你想象的要紧密得多。你在 PyTorch 里写一个矩阵乘，框架会把它映射成某个后端算子；算子又会落在一个 GPU kernel 上；而 kernel 跑得快不快，最终取决于数据布局、访存方式、并行度和硬件特性。换句话说，从一行 Python 到 GPU 上的电信号，中间隔着五六层抽象。profiling 工具看到的时间线，就是把这些层重新串起来的那根线索——有了它，你才知道"慢"到底出在哪一层。
 
-```bash
-python chapter1/check_torch_rocm.py 2>&1 | tee check_torch_rocm.log
+本教程会反复使用下面这条主线。请把它记在心里——它比任何具体工具都重要：
+
+```mermaid
+flowchart LR
+    A[理解系统和硬件] --> B[设计可信 benchmark]
+    B --> C[用 profiling 找证据]
+    C --> D[提出优化假设]
+    D --> E[修改代码或配置]
+    E --> F[复测并写报告]
+    F --> G[沉淀为 Agent 工作流]
 ```
 
-<details>
-<summary>输出：日志命令结果</summary>
+<div align="center">
+  <p>图 0.2 本教程反复使用的 AI Infra 优化闭环</p>
+</div>
 
-```text
-python: 3.12.12
-torch: 2.9.1+rocm7.12.0
-cuda_available: True
-device_count: 1
-device_name: Radeon 8060S Graphics
-result_shape: (1024, 1024)
-result_dtype: torch.float32
-result_device: cuda:0
-result_checksum: 89723.382812
+工具会换代，硬件会迭代，框架版本会升级——但「先测量、再判断、再优化、再复测」这套思维习惯不会过时。后面每一章的实验设计，都是这个闭环在某一个环节上的展开。等你学完整本教程再回头看图 0.2，会发现它已经把 AI Infra 的方法论画完了。
+
+## 0.3 为什么主线选 AMD GPU / ROCm
+
+市面上的 GPU 学习资料，十本里有九本默认从 CUDA 起步。这很自然——CUDA 生态成熟、社区庞大、经典优化案例也大多来自 NVIDIA 平台。但我们还是刻意选了 AMD GPU / ROCm 这条路。
+
+**不是为了"反 CUDA"，而是希望你借这条路线，把系统视角练得更通用一些。**
+
+GPU 性能优化里真正核心的问题，并不归某个厂商独有：
+
+- 数据是否连续访问？
+- 算子是计算瓶颈还是访存瓶颈？
+- kernel launch 开销是否值得关注？
+- batch 和并发策略是否合理？
+- profiling 结果能不能撑起优化结论？
+- 自动调参是否真的在当前硬件上变快了？
+
+这些问题在任何平台上都会出现，变的只是工具名、术语和实现细节。沿着 AMD GPU / ROCm 学下来，你会接触 CU、Wavefront、LDS、HIP、HSA、MIGraphX、Triton on AMD 这些概念。一开始可能会觉得有点陌生——没关系，陌生感恰恰说明你正在从"框架使用者"往"系统优化者"的方向走。
+
+也提前划一下边界：**这本教程不是 CUDA 到 ROCm 的逐 API 翻译手册**。需要时我们会提一笔 HIP 和 CUDA 的对应关系，但不会把每一节写成对照表。你的注意力应该花在更值钱的问题上：
+
+- 这个算子为什么慢？
+- 慢的证据在哪里？
+- 当前硬件上能尝试哪些优化？
+- 优化后怎么确认结果是可信的？
+
+最后再强调一次：**本教程所有实验数据基于 AI MAX 395 + ROCm 7.12.0**。其他 AMD GPU 可以参考方法论，但性能数字和工具可用性需要自己实测验证。
+
+## 0.4 这本教程和别的 AI Infra 教程有什么不同
+
+市面上已经有不少讲 AI Infra 的好资料了。有的深入某个框架源码，有的手把手教你写 CUDA kernel，有的把编译器优化讲得很透。那我们为什么还要再写一本？
+
+如果只能让你带走三个关键词，那就是下面这三个。它们就是本教程和"工具使用说明书"之间最大的分界线：
+
+| 关键词 | 含义 | 你会怎么练 |
+| ---- | ---- | ---- |
+| Hardware-Aware | 先理解程序最终怎样落到硬件执行 | 看 CU、Wavefront、LDS、访存和并行度 |
+| Profiling-Driven | 用数据决定优化方向 | 写 benchmark、看 timeline、读 profiling 报告 |
+| Agent-Driven | 把重复的分析和实验流程自动化 | 构建 AutoInfra Agent |
+
+**第一，Hardware-Aware（硬件感知）**
+
+很多性能问题看上去发生在 Python 或框架层，真正的根因却埋在硬件执行那一层。一个 kernel 慢，可能不是因为算得多，而是访存方式不好；一个推理服务吞吐上不去，也可能跟模型结构没什么关系，而是 batch、并发和显存之间的账没算清楚。所以我们不会只讲"怎么写代码"，而是会反复追问："这段代码落到 GPU 上，到底在干什么？"
+
+**第二，Profiling-Driven（用数据驱动优化）**
+
+我们不鼓励凭感觉改代码。**一个优化成不成立，必须经过 benchmark 和 profiling 验证**。后续大量章节都遵循同一个节奏：先写 baseline，再测量，再分析瓶颈，提出假设，最后复测。这个流程听起来朴素，但你会发现它能帮你过滤掉一大半"看上去变快了"的伪优化——而这是真正做性能工作的人最怕的东西。
+
+**第三，Agent-Driven（把流程自动化）**
+
+注意，这里的 Agent **不是**"让大模型随便生成一段代码"。在 AI Infra 场景里有价值的 Agent，应该会读硬件信息、跑 benchmark、调 profiling、整理日志、列实验计划、比较 before / after，并且把失败的尝试也老老实实记下来——因为失败的记录往往比成功的那一次更值钱。
+
+所以本教程最后的 AutoInfra Agent，并不是凭空给出"最优代码"，而是把前面这些流程串成一个可以反复运行的闭环：
+
+```mermaid
+flowchart LR
+    A[硬件画像] --> B[Benchmark]
+    B --> C[Profiling]
+    C --> D[瓶颈判断]
+    D --> E[优化计划]
+    E --> F[代码候选]
+    F --> G[复测]
+    G --> H[报告]
 ```
 
-</details>
+<div align="center">
+  <p>图 0.3 AutoInfra Agent 的最小优化闭环</p>
+</div>
 
-另外，尽量把下面这些版本信息也记下来——别嫌麻烦，一行命令报错时它们能帮你省掉至少半小时的盲目搜索：
+这就是本教程最核心的野心：不只要告诉你按钮在哪儿，更要让你看清每一步在整个闭环里承担什么角色——以及，为什么**这个角色缺了，链路就断了**。
 
-- ROCm 版本
-- Python 版本
-- PyTorch 版本
-- uv 环境所在路径
-- 当前 GPU 架构
-- 运行日期
+## 0.5 你将完成的毕业项目：AutoInfra Agent
 
-最后请把这条铁律刻在心上：**先确认底层，再确认上层**，顺序千万别反过来。
+先把镜头快进到终点，看一眼你学完整本教程后的"毕业作品"：一个简化版的 **AutoInfra Agent**。
 
-```text
-ROCm / GPU 可见性
-  ↓
-Python 环境
-  ↓
-PyTorch ROCm
-  ↓
-HIP / Triton / profiling 工具
-```
+它不会一口气解决所有性能问题——那是科幻片里的剧情。它会做的是完成一个**可控、可复查的小闭环**：
 
-按这个顺序从下往上排查，无论是自己复盘，还是去问别人，沟通成本都会低很多。这也是整个 AI Infra 领域的通用排错思路——后面做 profiling、调优时，你还会反复用到这一条。
+1. 读取当前机器的硬件和软件环境，生成硬件画像。
+2. 运行指定算子或推理 pipeline 的 benchmark。
+3. 调用 profiling 工具，提取关键 kernel 和开销分布。
+4. 根据规则和 LLM 推理，生成瓶颈判断和优化候选。
+5. 对低风险参数或代码做候选修改。
+6. 重新运行 benchmark，比较前后结果。
+7. 输出一份包含命令、日志、指标、失败尝试和下一步建议的报告。
 
-## 附录 A：环境安装细节与常见坑
+它的价值不在"Agent 一定能写出最快的代码"——换个角度想，如果 Agent 每次都能一次到位，那说明问题本身就太简单了。真正重要的是，它把优化流程变成了**可记录、可复查、可迭代**的系统。在团队协作、版本演进和事后复盘里，这三个"可"比单次最优值重要得多。
 
-主线内容只要求你会跑 `uv sync` 和几个验证命令。但很多读者还会想知道——**这套环境文件到底是怎么来的？**这一节就从这个问题出发，按步骤拆开本篇环境的生成过程，顺便把几个反复出现的坑提前指出来。
+你可以把这个毕业项目当成前面所有章节的"演练场"——前面练的每一项能力，都会在这里找到属于自己的位置：
 
-正常学习时你不需要每次重建这些文件，只要仓库里已经有 `pyproject.toml` 和 `uv.lock`，前面的 `uv sync` 就够用了。这一节更适合两种场景：你想自己开新篇、用 `bootstrap` 脚本从头搭环境；或者环境出了奇怪问题，想搞清楚每个文件是干什么的。
-
-### A.1 用脚本生成本篇初始环境
-
-从零准备一篇新内容时，一条命令就能生成这一篇自己的 uv 环境文件：
-
-```bash
-cd hello-ai-infra
-bash scripts/bootstrap-rocm-env.sh --part part0-preface
-```
-
-这个脚本会在 `code/part0-preface/` 下准备好三类文件：
-
-```text
-code/part0-preface/
-├── pyproject.toml
-├── uv.lock
-└── activate-rocm.sh
-```
-
-各司其职：
-
-| 文件 | 作用 |
+| 前面学到的能力 | 在毕业项目里的作用 |
 | ---- | ---- |
-| `pyproject.toml` | 写清楚本篇需要哪些 Python / ROCm 包 |
-| `uv.lock` | 锁定实际解析出来的包版本，保证复现 |
-| `activate-rocm.sh` | 激活 `.venv`，并设置 `ROCM_PATH` / `HIP_PATH` 等环境变量 |
+| 硬件基础 | 让 Agent 知道当前机器是什么 |
+| Profiling | 让 Agent 知道应该收集什么证据 |
+| HIP / Triton | 给 Agent 提供可尝试的优化对象 |
+| 推理优化 | 让 Agent 不只盯着单个算子 |
+| 编译器与自动调优 | 让 Agent 理解搜索空间和候选配置 |
+| 报告写作 | 让人类 reviewer 能检查结论是否可信 |
 
-生成出来的 `pyproject.toml` 会自动用篇名作为项目名，例如：
+这里有一条贯穿始终的底线：**Agent 的输入数据必须可信**。benchmark 不可信、profiling 没保存、硬件上下文没写清楚——那么不管 Agent 的报告写得多漂亮，都不能拿到工程场合当结论用。数据质量决定 Agent 的上限，这一点怎么强调都不为过。
 
-```toml
-[project]
-name = "part0-preface"
-```
+## 0.6 学习路线图与读者画像
 
-### A.2 添加 PyTorch ROCm 依赖
+这一节给你两样东西：一条推荐路线，和一份"对号入座"的读者画像。建议你先按顺序读，等熟悉后再按主题回看——就像去一个新城市，第一次坐地铁跟着线路图走，熟了之后自然会知道在哪换乘。
 
-`bootstrap` 脚本生成的环境只包含 ROCm wheel 基础包。本章还要跑 PyTorch，所以需要把 PyTorch ROCm、Triton 和 NumPy 加进本篇的依赖列表。
+### 推荐学习路线
 
-在本篇目录下执行：
+| 阶段 | 对应篇章 | 你要学什么 | 学完能做什么 |
+| ---- | ---- | ---- | ---- |
+| 0 | 前言与环境 | 项目定位、环境验证、实验边界 | 判断自己能否跟着教程跑 |
+| 1 | AI Infra 全景与 AMD GPU 基础 | 系统地图、ROCm 软件栈、GPU 基本概念 | 看懂后续章节的硬件和软件名词 |
+| 2 | 性能分析与瓶颈定位 | benchmark、profiling、报告 | 用证据说明程序慢在哪里 |
+| 3 | HIP 算子优化 | 手写 kernel、访存、LDS、Reduction | 写出并分析教学版 GPU 算子 |
+| 4 | Triton on AMD | Matmul、Softmax、Attention、autotune | 用更高层表达写常见算子 |
+| 5 | 推理优化与模型部署 | 端到端延迟、吞吐、服务化、LLM 指标 | 分析完整推理 pipeline 的性能 |
+| 6 | AI 编译器与自动调优 | 图优化、调度搜索、工具定位 | 理解编译器为什么能优化模型 |
+| 7 | AutoInfra Agent | 数据结构、自动实验、报告生成 | 搭建一个最小自动优化系统 |
 
-```bash
-cd code/part0-preface
-uv add "torch==2.9.1+rocm7.12.0" "triton==3.5.1+rocm7.12.0" "numpy>=2.4.4"
-```
+### 不同读者怎么读这本教程
 
-添加完成后，`pyproject.toml` 里应该能看到这些依赖：
+| 你是谁 | 这本教程能帮你 | 推荐读法 |
+| ---- | ---- | ---- |
+| AI 应用 / 算法工程师，想搞清楚"模型为什么慢" | 学会用 profiling 找证据，而不是凭直觉调参 | 别跳过第 2 篇；第 3、4 篇按需选读 |
+| 刚接触 GPU 编程的同学 | 从 HIP 最小例子起步，逐步建立硬件直觉 | 从头顺序读，第 3 篇是你的核心训练场 |
+| 有 CUDA 经验、想看看 ROCm 什么样 | 在熟悉概念上"换个平台"再练一遍 | 快速浏览第 1 篇，重点攻第 4、5 篇 |
+| 推理部署 / 服务化方向 | 把端到端延迟、吞吐、batch 拆开看 | 第 2 + 第 5 篇组合阅读 |
+| 对编译器、自动调优感兴趣 | 理解搜索空间和调度变换到底在做什么 | 第 4、6 篇 |
+| 想做 LLM × Infra 的 Agent 工作 | 看 Agent 怎么和真实工程闭环结合 | 通读全本，重点在第 7 篇 |
 
-```toml
-[project]
-dependencies = [
-    "numpy>=2.4.4",
-    "rocm==7.12.0",
-    "rocm-sdk-core==7.12.0",
-    "rocm-sdk-devel==7.12.0",
-    "rocm-sdk-libraries-gfx1151==7.12.0",
-    "torch==2.9.1+rocm7.12.0",
-    "triton==3.5.1+rocm7.12.0",
-]
-```
+如果你是初学者，**请务必不要跳过第 2 篇**。很多人一上来就急着写 kernel、调参数，但要是连测量都测不准，所谓的"优化"就很容易变成赌博——你连自己是赢了还是输了都不知道。
 
-这里有一个很容易踩的坑：`torch` 和 `triton` 也来自 AMD gfx1151 wheel 源，所以它们同样需要在 `[tool.uv.sources]` 里映射到 `rocm-amd`：
+如果你已经有 GPU 编程经验，前两篇可以快速翻阅，把主要精力放在 Profiling、Triton 和 Agent 上。但还是建议先读完第 1 章的环境验证——确认基础链路打通之后，后面会顺手很多。
 
-```toml
-[tool.uv.sources]
-torch = { index = "rocm-amd" }
-triton = { index = "rocm-amd" }
-```
+## 0.7 环境与前置知识
 
-忘了这一步是个**老熟人级别的坑**：`uv` 会跑去普通 PyPI 找 `torch==2.9.1+rocm7.12.0`，然后理所当然地告诉你"找不到这个版本"——不是包不存在，是找错了地方。
+这一节说明开始之前需要准备什么。先讲知识，再讲环境。
 
-### A.3 为什么 AMD wheel 源要 explicit
+知识上，你最好具备三类基础：
 
-ROCm 相关包来自 AMD gfx1151 wheel 源：
+| 基础 | 需要到什么程度 |
+| ---- | ---- |
+| Python | 能运行脚本、看懂函数、列表、字典和基本包管理 |
+| Linux 命令行 | 能进入目录、运行命令、查看日志、理解环境变量 |
+| 深度学习概念 | 大概知道 tensor、batch、矩阵乘、Softmax、Attention、推理是什么 |
 
-```toml
-[[tool.uv.index]]
-name = "rocm-amd"
-url = "https://repo.amd.com/rocm/whl/gfx1151/"
-explicit = true
-```
+请放心，你不需要一开始就会 GPU 编程，更不需要先成为编译器专家。本教程的做法是把复杂内容一层层拆开，从"能跑通的最小例子"开始往上搭。你不会一上来就被扔进几百行 kernel 代码里。
 
-`explicit = true` 的意思是：**只有在 `[tool.uv.sources]` 里被明确点名映射到 `rocm-amd` 的包，才会去这个源查询**，其他包一律不打扰它。
+环境上，本教程当前的实验基线是：
 
-这一点非常关键。AMD wheel 源有个"脾气"——对一些普通 Python 包，它不返回"没找到"，而是直接甩一个 `403 Forbidden`。如果让 uv 在解析任意包时都跑去问 AMD 源，那些普通依赖就可能被这个 `403` 一刀切，整个解析直接崩掉。
+| 项目 | 当前基线 |
+| ---- | ---- |
+| 主线硬件 | AI MAX 395 |
+| GPU 架构 | gfx1151 |
+| ROCm 版本 | 7.12.0 |
+| Python 环境管理 | uv |
 
-所以本篇环境采用"双源 + 显式映射"的结构，让两类包各走各的路：
+这里的"基线"不是说其他设备一定跑不了——不同 AMD GPU 的读者都可以借鉴方法论，但性能数字需要在自己设备上实测。
 
-```toml
-[[tool.uv.index]]
-name = "rocm-amd"
-url = "https://repo.amd.com/rocm/whl/gfx1151/"
-explicit = true
-
-[tool.uv.sources]
-rocm = { index = "rocm-amd" }
-rocm-sdk-core = { index = "rocm-amd" }
-rocm-sdk-devel = { index = "rocm-amd" }
-rocm-sdk-libraries-gfx1151 = { index = "rocm-amd" }
-torch = { index = "rocm-amd" }
-triton = { index = "rocm-amd" }
-```
-
-普通包继续从默认 PyPI（或镜像）走，ROCm 相关的才走 AMD wheel 源。井水不犯河水，干净利落。
-
-### A.4 `rocm-sdk init` 和 `ROCM_PATH` 的坑
-
-这是本篇里**最容易让人栽跟头的一个坑**，单独拎出来讲透。
-
-`rocm-sdk-devel` 装完之后，devel 的内容并不会自动展开——需要手动（或通过脚本）把它展开到 `_rocm_sdk_devel` 目录里，HIP 编译器才能找到 ROCm device library。
-
-本篇的 `activate-rocm.sh` 已经替你处理了这一步。所以正常情况下，你只需要两条命令：
-
-```bash
-uv sync
-source ./activate-rocm.sh
-```
-
-脚本内部会检查 `_rocm_sdk_devel` 是否存在，不存在就帮你跑一次 `rocm-sdk init`，然后再回头查找正确的路径。
-
-但如果你在没有用新版 `activate-rocm.sh` 的情况下手动操作，就很容易掉进下面这个陷阱——
-
-步骤是这样的：
-
-1. 你激活环境后看到 `ROCM_PATH=.../_rocm_sdk_core`（指向了 core 而非 devel）
-2. 你觉得不对，于是手动运行 `rocm-sdk init`
-3. 这条命令确实把 devel 文件展开出来了
-4. 但它**不会回头刷新当前 shell 里已经设好的 `ROCM_PATH` / `HIP_PATH`**
-5. 于是同一个终端里继续编译，`hipcc` 还在用旧的 `_rocm_sdk_core` 路径
-6. 结果就是下面这个让人摸不着头脑的报错：
-
-```text
-clang++: error: cannot find ROCm device library; provide its path via '--rocm-path' or '--rocm-device-lib-path'
-```
-
-修复方法出奇简单——把脚本重新 source 一次就行：
-
-```bash
-source ./activate-rocm.sh
-```
-
-正确状态应该是这样：
-
-```text
-ROCM_PATH=.../_rocm_sdk_devel
-```
-
-看到 `_rocm_sdk_devel` 而不是 `_rocm_sdk_core`，这个坑就算迈过去了。
+下一章会带你做环境准备与验证。它不会一上来就展开 ROCm 软件栈的内部原理，只帮你确认三件最关键的事：ROCm 能不能看到 GPU？PyTorch ROCm 能不能跑？最小 HIP 程序能不能编译运行？三道门推开，后面的路就是通的。
 
 ## 本章小结
 
-- 本章推开了三道环境验证门：**ROCm 可见、PyTorch ROCm、最小 HIP 路径**，每一道都是上一道的延伸，跳不过去。
-- 环境通过 `pyproject.toml` + `uv.lock` 固化，进入 `code/part0-preface` 后只需 `uv sync` 就能复现——不用手动装任何东西。
-- `activate-rocm.sh` 负责处理 ROCm wheel 的环境变量，最核心的职责是让 `ROCM_PATH` 指向 `_rocm_sdk_devel`，而不是 `_rocm_sdk_core`。
-- PyTorch ROCm 里看到 `cuda:0` 完全正常，是历史命名问题，**不代表**你在用 NVIDIA GPU。
-- 环境不通时不要只甩一句"失败了"——把机器信息、目录、命令、完整输出、版本号和最近改动一起拿出来，排错效率会高一个数量级。
-- 下一章我们正式进入 AI Infra 全景图，把模型、框架、算子、编译器、运行时和硬件放到同一条链路里来看——三道门之后的风景，我们来了。
+- **AI Infra 是连接层的工程**——模型、框架、算子、编译器、运行时、硬件和服务系统之间的衔接处，往往才是性能问题真正的藏身之所。只盯着其中一层，就像只看一根链条上的一个链节。
+- 本教程的三条主线是 **Hardware-Aware、Profiling-Driven、Agent-Driven**，不是工具清单，更不是 API 对照表。工具会换代，但这三种思维方式不会。
+- 实验结论基于 **AI MAX 395 + ROCm 7.12.0**，其他设备的读者请以方法论为主、自行复测数据。
+- 学习路线从环境验证起步，经过 profiling、HIP、Triton、推理优化、编译器，最终落到 AutoInfra Agent——每一站都是下一站的基础。
+- 下一章解决第一个动手问题：**怎样确认你的 AMD GPU 实验环境可以继续往后跑？**
 
 ## 延伸阅读
 
-- [uv Documentation](https://docs.astral.sh/uv/)
 - [AMD ROCm Documentation](https://rocm.docs.amd.com/)
-- [PyTorch Get Started](https://pytorch.org/get-started/locally/)
+- [PyTorch](https://pytorch.org/)
