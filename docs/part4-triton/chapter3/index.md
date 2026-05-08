@@ -41,7 +41,7 @@ description: "Hello AI Infra 第17章 · 行级 Softmax、数值稳定、block r
 
 - 本章目前是 Alpha 阶段的大纲骨架，正式正文会在对应实验跑通后补齐。
 - 涉及命令、输出或性能数字的内容，后续必须在 AI MAX 395 + ROCm 7.12.0 上实测。
-- 与本章相关的代码、日志和实验底稿会放在 `code/part4-triton/chapter15/`。
+- 与本章相关的代码、日志和实验底稿会放在 `code/part4-triton/chapter3/`。
 
 ## 延伸阅读
 
