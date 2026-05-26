@@ -1,6 +1,6 @@
 ---
 title: "第36章 毕业项目：AutoInfra Agent 完整案例"
-description: "Hello AI Infra 第36章 · 完整系统、Triton Softmax、YOLO pipeline、AMD GPU 性能诊断报告"
+description: "Hello GPU 第36章 · 完整系统、Triton Softmax、YOLO pipeline、AMD GPU 性能诊断报告"
 ---
 
 # 第36章 毕业项目：AutoInfra Agent 完整案例

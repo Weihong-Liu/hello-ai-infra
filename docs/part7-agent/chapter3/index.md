@@ -1,6 +1,6 @@
 ---
 title: "第31章 自动 Benchmark 与 Profiling 数据管线"
-description: "Hello AI Infra 第31章 · 自动运行 benchmark、调用 profiling、保存结果、对比版本"
+description: "Hello GPU 第31章 · 自动运行 benchmark、调用 profiling、保存结果、对比版本"
 ---
 
 # 第31章 自动 Benchmark 与 Profiling 数据管线

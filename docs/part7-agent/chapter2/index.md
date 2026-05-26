@@ -1,6 +1,6 @@
 ---
 title: "第30章 实验资产与数据结构"
-description: "Hello AI Infra 第30章 · 硬件画像、实验配置、benchmark 结果、profiling 输出、报告数据模型"
+description: "Hello GPU 第30章 · 硬件画像、实验配置、benchmark 结果、profiling 输出、报告数据模型"
 ---
 
 # 第30章 实验资产与数据结构

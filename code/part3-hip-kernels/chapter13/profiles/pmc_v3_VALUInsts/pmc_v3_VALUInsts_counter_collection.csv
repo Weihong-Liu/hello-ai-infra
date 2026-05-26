@@ -1,0 +1,16 @@
+"Correlation_Id","Dispatch_Id","Agent_Id","Queue_Id","Process_Id","Thread_Id","Grid_Size","Kernel_Id","Kernel_Name","Workgroup_Size","LDS_Block_Size","Scratch_Size","VGPR_Count","Accum_VGPR_Count","SGPR_Count","Counter_Name","Counter_Value","Start_Timestamp","End_Timestamp"
+1,1,"Agent 1",1,997679,997679,256,1,"__amd_rocclr_fillBufferAligned",256,0,0,16,0,128,"VALUInsts",5.750000,6125131782908619,6125131782911825
+2,2,"Agent 1",1,997679,997679,67108864,17,"reduce_v3_unrolled(float const*, float*, int)",256,0,0,16,0,128,"VALUInsts",28.354650,6125131783408911,6125131792125342
+3,3,"Agent 1",1,997679,997679,256,1,"__amd_rocclr_fillBufferAligned",256,0,0,16,0,128,"VALUInsts",5.750000,6125131792164455,6125131792166579
+4,4,"Agent 1",1,997679,997679,67108864,17,"reduce_v3_unrolled(float const*, float*, int)",256,0,0,16,0,128,"VALUInsts",28.367409,6125131792189693,6125131800904509
+5,5,"Agent 1",1,997679,997679,256,1,"__amd_rocclr_fillBufferAligned",256,0,0,16,0,128,"VALUInsts",5.750000,6125131800966314,6125131800968398
+6,6,"Agent 1",1,997679,997679,67108864,17,"reduce_v3_unrolled(float const*, float*, int)",256,0,0,16,0,128,"VALUInsts",28.358586,6125131800991161,6125131809703411
+7,7,"Agent 1",1,997679,997679,256,1,"__amd_rocclr_fillBufferAligned",256,0,0,16,0,128,"VALUInsts",5.750000,6125131809728659,6125131809730823
+8,8,"Agent 1",1,997679,997679,67108864,17,"reduce_v3_unrolled(float const*, float*, int)",256,0,0,16,0,128,"VALUInsts",28.358802,6125131809754257,6125131818484041
+9,9,"Agent 1",1,997679,997679,256,1,"__amd_rocclr_fillBufferAligned",256,0,0,16,0,128,"VALUInsts",5.750000,6125131818524556,6125131818526720
+10,10,"Agent 1",1,997679,997679,67108864,17,"reduce_v3_unrolled(float const*, float*, int)",256,0,0,16,0,128,"VALUInsts",28.368762,6125131818550365,6125131827276181
+11,11,"Agent 1",1,997679,997679,256,1,"__amd_rocclr_fillBufferAligned",256,0,0,16,0,128,"VALUInsts",5.750000,6125131827314454,6125131827315776
+12,12,"Agent 1",1,997679,997679,67108864,17,"reduce_v3_unrolled(float const*, float*, int)",256,0,0,16,0,128,"VALUInsts",28.375164,6125131827339741,6125131836055258
+13,13,"Agent 1",1,997679,997679,256,1,"__amd_rocclr_fillBufferAligned",256,0,0,16,0,128,"VALUInsts",5.750000,6125131836089042,6125131836091286
+14,14,"Agent 1",1,997679,997679,67108864,17,"reduce_v3_unrolled(float const*, float*, int)",256,0,0,16,0,128,"VALUInsts",28.404447,6125131836114959,6125131844838377
+15,15,"Agent 1",1,997679,997679,512,7,"__amd_rocclr_copyBuffer",512,0,0,16,0,128,"VALUInsts",8.062500,6125131844892578,6125131844895704

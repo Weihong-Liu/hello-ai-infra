@@ -1,4 +1,7 @@
 import { defineConfig } from 'vitepress'
+import footnote from 'markdown-it-footnote'
+import mathjax3 from 'markdown-it-mathjax3'
+import figurePlugin from './markdown-figures.mjs'
 import { navItems, sidebar } from './outline.mjs'
 
 function encodeMermaid(value: string) {
@@ -10,14 +13,37 @@ const baseConfig = isEdgeOne ? '/' : '/hello-ai-infra/'
 
 export default defineConfig({
   lang: 'zh-CN',
-  title: 'Hello AI Infra',
-  description: '从硬件到智能体的 AI 基础设施实践教程',
+  title: 'Hello GPU',
+  description: '从硬件到智能体的 AI 基础设施实践教程（单卡 AMD GPU 视角；多卡见 hello-mlsys，平台层见 hello-ai-infra-platform）',
   base: baseConfig,
 
   cleanUrls: true,
 
+  srcExclude: ['part7-agent/**'],
+
+  vue: {
+    template: {
+      compilerOptions: {
+        // mathjax3 emits <mjx-container> / <mjx-...> custom elements; keep
+        // Vue from trying to resolve them as components.
+        isCustomElement: (tag: string) => tag.startsWith('mjx-'),
+      },
+    },
+  },
+
   markdown: {
     config(md) {
+      md.use(footnote)
+      md.use(mathjax3)
+      md.use(figurePlugin)
+
+      // 同一条脚注被多次引用时，默认会渲染成 [6]、[6:1]、[6:2] …
+      // 对读者没有意义，统一只显示脚注序号，让回跳锚点照常工作。
+      md.renderer.rules.footnote_caption = (tokens, idx) => {
+        const n = Number(tokens[idx].meta.id + 1).toString()
+        return `[${n}]`
+      }
+
       const fence = md.renderer.rules.fence!
       md.renderer.rules.fence = (tokens, idx, options, env, self) => {
         const token = tokens[idx]

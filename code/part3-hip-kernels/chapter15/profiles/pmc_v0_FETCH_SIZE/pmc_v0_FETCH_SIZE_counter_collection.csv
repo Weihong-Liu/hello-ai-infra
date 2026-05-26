@@ -1,0 +1,24 @@
+"Correlation_Id","Dispatch_Id","Agent_Id","Queue_Id","Process_Id","Thread_Id","Grid_Size","Kernel_Id","Kernel_Name","Workgroup_Size","LDS_Block_Size","Scratch_Size","VGPR_Count","Accum_VGPR_Count","SGPR_Count","Counter_Name","Counter_Value","Start_Timestamp","End_Timestamp"
+1,1,"Agent 1",1,998625,998625,1024,12,"__amd_rocclr_copyBuffer",512,0,0,16,0,128,"FETCH_SIZE",8.375000,6125231982746237,6125231982750284
+2,2,"Agent 1",1,998625,998625,1024,12,"__amd_rocclr_copyBuffer",512,0,0,16,0,128,"FETCH_SIZE",8.125000,6125231982808353,6125231982810557
+3,3,"Agent 1",1,998625,998625,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"FETCH_SIZE",32771.062500,6125231983510448,6125231983929999
+4,4,"Agent 1",1,998625,998625,4194304,19,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"FETCH_SIZE",32776.375000,6125231983953964,6125231984285350
+5,5,"Agent 1",1,998625,998625,4194304,18,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"FETCH_SIZE",33171.375000,6125231984308513,6125231984839595
+6,6,"Agent 1",1,998625,998625,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"FETCH_SIZE",32768.000000,6125231984866566,6125231985271651
+7,7,"Agent 1",1,998625,998625,4194304,19,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"FETCH_SIZE",32776.000000,6125231985295977,6125231985641148
+8,8,"Agent 1",1,998625,998625,4194304,18,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"FETCH_SIZE",33175.750000,6125231985665353,6125231986192308
+9,9,"Agent 1",1,998625,998625,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"FETCH_SIZE",32768.125000,6125231986237473,6125231986635704
+10,10,"Agent 1",1,998625,998625,4194304,19,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"FETCH_SIZE",32776.125000,6125231986661232,6125231987009610
+11,11,"Agent 1",1,998625,998625,4194304,18,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"FETCH_SIZE",33181.375000,6125231987032773,6125231987560048
+12,12,"Agent 1",1,998625,998625,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"FETCH_SIZE",32768.000000,6125231987587821,6125231987980642
+13,13,"Agent 1",1,998625,998625,4194304,19,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"FETCH_SIZE",32776.125000,6125231988004767,6125231988349338
+14,14,"Agent 1",1,998625,998625,4194304,18,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"FETCH_SIZE",33174.625000,6125231988372942,6125231988899456
+15,15,"Agent 1",1,998625,998625,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"FETCH_SIZE",32768.125000,6125231988926386,6125231989321852
+16,16,"Agent 1",1,998625,998625,4194304,19,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"FETCH_SIZE",32776.000000,6125231989345016,6125231989690668
+17,17,"Agent 1",1,998625,998625,4194304,18,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"FETCH_SIZE",33180.750000,6125231989714513,6125231990243552
+18,18,"Agent 1",1,998625,998625,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"FETCH_SIZE",32768.000000,6125231990271043,6125231990678172
+19,19,"Agent 1",1,998625,998625,4194304,19,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"FETCH_SIZE",32776.125000,6125231990702337,6125231991036047
+20,20,"Agent 1",1,998625,998625,4194304,18,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"FETCH_SIZE",33178.000000,6125231991060854,6125231991587607
+21,21,"Agent 1",1,998625,998625,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"FETCH_SIZE",32768.000000,6125231991615620,6125231992013371
+22,22,"Agent 1",1,998625,998625,4194304,19,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"FETCH_SIZE",32776.000000,6125231992037416,6125231992376256
+23,23,"Agent 1",1,998625,998625,4194304,18,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"FETCH_SIZE",33176.625000,6125231992400100,6125231992926373

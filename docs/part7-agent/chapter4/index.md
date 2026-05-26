@@ -1,6 +1,6 @@
 ---
 title: "第32章 瓶颈判断与优化计划"
-description: "Hello AI Infra 第32章 · Memory-bound / Compute-bound 判断、优化候选、优先级排序、实验计划"
+description: "Hello GPU 第32章 · Memory-bound / Compute-bound 判断、优化候选、优先级排序、实验计划"
 ---
 
 # 第32章 瓶颈判断与优化计划

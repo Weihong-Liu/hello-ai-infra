@@ -1,6 +1,6 @@
 ---
 title: "第33章 代码修改、运行与回滚"
-description: "Hello AI Infra 第33章 · 生成候选代码、自动插入 benchmark、检查编译错误、失败回滚"
+description: "Hello GPU 第33章 · 生成候选代码、自动插入 benchmark、检查编译错误、失败回滚"
 ---
 
 # 第33章 代码修改、运行与回滚

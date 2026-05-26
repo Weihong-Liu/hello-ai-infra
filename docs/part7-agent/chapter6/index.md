@@ -1,6 +1,6 @@
 ---
 title: "第34章 报告生成与实验追踪"
-description: "Hello AI Infra 第34章 · before / after 表格、失败尝试、证据链、下一步优化方向"
+description: "Hello GPU 第34章 · before / after 表格、失败尝试、证据链、下一步优化方向"
 ---
 
 # 第34章 报告生成与实验追踪

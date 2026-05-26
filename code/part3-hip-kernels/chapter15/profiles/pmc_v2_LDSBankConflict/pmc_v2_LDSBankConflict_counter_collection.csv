@@ -1,0 +1,10 @@
+"Correlation_Id","Dispatch_Id","Agent_Id","Queue_Id","Process_Id","Thread_Id","Grid_Size","Kernel_Id","Kernel_Name","Workgroup_Size","LDS_Block_Size","Scratch_Size","VGPR_Count","Accum_VGPR_Count","SGPR_Count","Counter_Name","Counter_Value","Start_Timestamp","End_Timestamp"
+1,1,"Agent 1",1,998718,998718,1024,3,"__amd_rocclr_copyBuffer",512,0,0,16,0,128,"LDSBankConflict",0.00000000e+00,6125236161846918,6125236161851927
+2,2,"Agent 1",1,998718,998718,1024,3,"__amd_rocclr_copyBuffer",512,0,0,16,0,128,"LDSBankConflict",0.00000000e+00,6125236161936417,6125236161938701
+3,3,"Agent 1",1,998718,998718,4194304,16,"layernorm_v2_float4(float const*, float const*, float const*, float*, int, float)",1024,0,0,24,0,128,"LDSBankConflict",0.00000000e+00,6125236162446635,6125236163049259
+4,4,"Agent 1",1,998718,998718,4194304,16,"layernorm_v2_float4(float const*, float const*, float const*, float*, int, float)",1024,0,0,24,0,128,"LDSBankConflict",0.00000000e+00,6125236163076992,6125236163658376
+5,5,"Agent 1",1,998718,998718,4194304,16,"layernorm_v2_float4(float const*, float const*, float const*, float*, int, float)",1024,0,0,24,0,128,"LDSBankConflict",0.00000000e+00,6125236163742846,6125236164321585
+6,6,"Agent 1",1,998718,998718,4194304,16,"layernorm_v2_float4(float const*, float const*, float const*, float*, int, float)",1024,0,0,24,0,128,"LDSBankConflict",0.00000000e+00,6125236164351602,6125236164928898
+7,7,"Agent 1",1,998718,998718,4194304,16,"layernorm_v2_float4(float const*, float const*, float const*, float*, int, float)",1024,0,0,24,0,128,"LDSBankConflict",0.00000000e+00,6125236164958234,6125236165539537
+8,8,"Agent 1",1,998718,998718,4194304,16,"layernorm_v2_float4(float const*, float const*, float const*, float*, int, float)",1024,0,0,24,0,128,"LDSBankConflict",0.00000000e+00,6125236165568592,6125236166147612
+9,9,"Agent 1",1,998718,998718,4194304,16,"layernorm_v2_float4(float const*, float const*, float const*, float*, int, float)",1024,0,0,24,0,128,"LDSBankConflict",0.00000000e+00,6125236166192256,6125236166770675

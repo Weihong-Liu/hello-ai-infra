@@ -36,17 +36,17 @@ function chapterMarkdown(chapter) {
     .map(([title, body], index) => `## ${chapter.number}.${index + 1} ${title}\n\n${body}`)
     .join('\n\n')
 
-  return `---\ntitle: "第${chapter.number}章 ${chapter.title}"\ndescription: "Hello AI Infra 第${chapter.number}章 · ${chapter.summary}"\n---\n\n# 第${chapter.number}章 ${chapter.title}\n\n## 本章导读\n\n> ${chapter.lead}\n\n${sectionMarkdown}\n\n## 本章小结\n\n- 本章目前是 Alpha 阶段的大纲骨架，正式正文会在对应实验跑通后补齐。\n- 涉及命令、输出或性能数字的内容，后续必须在 AI MAX 395 + ROCm 7.12.0 上实测。\n- 与本章相关的代码、日志和实验底稿会放在 \`${chapter.code}/\`。\n\n## 延伸阅读\n\n- 待补：正式正文完成时补充对应官方文档、论文或工具链接。\n`
+  return `---\ntitle: "第${chapter.number}章 ${chapter.title}"\ndescription: "Hello GPU 第${chapter.number}章 · ${chapter.summary}"\n---\n\n# 第${chapter.number}章 ${chapter.title}\n\n## 本章导读\n\n> ${chapter.lead}\n\n${sectionMarkdown}\n\n## 本章小结\n\n- 本章目前是 Alpha 阶段的大纲骨架，正式正文会在对应实验跑通后补齐。\n- 涉及命令、输出或性能数字的内容，后续必须在 AI MAX 395 + ROCm 7.12.0 上实测。\n- 与本章相关的代码、日志和实验底稿会放在 \`${chapter.code}/\`。\n\n## 延伸阅读\n\n- 待补：正式正文完成时补充对应官方文档、论文或工具链接。\n`
 }
 
 function syncChapterMetadata(existing, chapter) {
   let next = existing
 
   if (/^---\n[\s\S]*?\n---\n/.test(next)) {
-    const frontmatter = `---\ntitle: "第${chapter.number}章 ${chapter.title}"\ndescription: "Hello AI Infra 第${chapter.number}章 · ${chapter.summary}"\n---\n`
+    const frontmatter = `---\ntitle: "第${chapter.number}章 ${chapter.title}"\ndescription: "Hello GPU 第${chapter.number}章 · ${chapter.summary}"\n---\n`
     next = next.replace(/^---\n[\s\S]*?\n---\n/, frontmatter)
   } else {
-    next = `---\ntitle: "第${chapter.number}章 ${chapter.title}"\ndescription: "Hello AI Infra 第${chapter.number}章 · ${chapter.summary}"\n---\n\n${next}`
+    next = `---\ntitle: "第${chapter.number}章 ${chapter.title}"\ndescription: "Hello GPU 第${chapter.number}章 · ${chapter.summary}"\n---\n\n${next}`
   }
 
   if (/^# 第\d+章 .+$/m.test(next)) {

@@ -8,9 +8,6 @@ export const parts = [
     readmeTitle: '第 0 篇：前言与学习路线',
     chapters: [
       {
-        path: '/part0-preface/chapter1/',
-        source: 'docs/part0-preface/chapter1/index.md',
-        code: 'code/part0-preface/chapter1',
         title: '写给读者的话',
         summary: 'AI Infra 的重要性、教程特色、学习路线',
         status: '🚧',
@@ -26,9 +23,6 @@ export const parts = [
         ]
       },
       {
-        path: '/part0-preface/chapter2/',
-        source: 'docs/part0-preface/chapter2/index.md',
-        code: 'code/part0-preface/chapter2',
         title: '环境准备与验证',
         summary: 'uv sync、AI MAX 395 + ROCm 7.12.0 基线、最小环境验证',
         status: '🚧',
@@ -47,55 +41,76 @@ export const parts = [
   },
   {
     prefix: '/part1-hardware-rocm/',
-    navText: '硬件基础',
-    title: 'AI Infra 全景与 AMD GPU 基础',
-    readmeTitle: '第 1 篇：AI Infra 全景与 AMD GPU 基础',
+    navText: 'GPU 体系结构',
+    title: 'GPU 体系结构与 ROCm 软件栈',
+    readmeTitle: '第 1 篇：GPU 体系结构与 ROCm 软件栈',
     chapters: [
       {
-        path: '/part1-hardware-rocm/chapter1/',
-        source: 'docs/part1-hardware-rocm/chapter1/index.md',
-        code: 'code/part1-hardware-rocm/chapter1',
-        title: 'AI Infra 全景图',
-        summary: '从模型到硬件的完整链路、HPOA 方法论',
+        title: 'GPU 在 AI 中的位置',
+        summary: '从一次推理请求出发，把模型、框架、算子、kernel、runtime、硬件串成单卡视角的链路图',
         status: '🚧',
-        lead: '本章从一次模型请求出发，把模型、框架、算子、编译器、运行时和硬件串成一张图。读完后，你应该能说清楚 AI Infra 优化到底在优化哪一层。',
+        lead: '本章把"GPU 性能问题"放回完整链路里看。读完后，你应该能区分 kernel 慢、调度慢、搬运慢、测量错这几类性能现象，并知道本书后续每一篇分别盯住哪一层。本篇后续四章会逐步把硬件、内存、软件栈、第一个程序串起来。',
         sections: [
-          ['从模型到硬件：一次推理请求经历了什么', '沿着请求路径观察模型服务、框架调度、算子执行和硬件运行的关系。'],
-          ['AI Infra 的核心模块', '理解训练框架、推理引擎、算子库、编译器、profiling 和调度系统各自的位置。'],
-          ['算子优化、推理优化、编译器优化分别解决什么问题', '区分三类优化的边界，避免把所有性能问题都归因于 kernel。'],
-          ['AI Infra 工程师的核心能力模型', '总结硬件理解、性能分析、工程实现和实验复现四类能力。'],
-          ['拿到性能问题时先怎么分诊', '用一张决策图把常见性能现象导向服务、框架、算子、运行时或硬件层。'],
-          ['本教程的学习闭环：理解 -> 测量 -> 优化 -> 自动化', '说明后续每一篇如何围绕同一个优化闭环推进。']
+          ['从模型到硬件：一次推理请求经历了什么', '沿着请求路径观察框架、算子、kernel、runtime、硬件的关系。'],
+          ['AI 计算栈中的 GPU 角色', '说明 GPU 既是计算单元又是访存单元，性能问题的两类来源。'],
+          ['算子优化、推理优化、编译器优化分别解决什么', '区分三类优化的边界，避免把所有性能问题都归因于 kernel。'],
+          ['拿到性能问题时先怎么分诊', '用一张决策图把常见性能现象导向算子、运行时或测量层。'],
+          ['本书的学习闭环：理解 → 测量 → 优化 → 复盘', '说明后续每一篇如何围绕同一个闭环推进。'],
+          ['GPU 工程师的核心能力模型', '总结硬件理解、性能分析、工程实现和复现表达四类能力。']
         ]
       },
       {
-        path: '/part1-hardware-rocm/chapter2/',
-        source: 'docs/part1-hardware-rocm/chapter2/index.md',
-        code: 'code/part1-hardware-rocm/chapter2',
-        title: 'AMD GPU 与 ROCm 软件栈',
-        summary: 'AMD GPU 执行模型、ROCm 层次、上层框架关系',
+        title: 'AMD GPU 体系结构',
+        summary: 'CU/SIMD/Wavefront/VGPR/SGPR/LDS、RDNA vs CDNA、gfx1151 定位、MFMA/WMMA Tensor 单元',
         status: '🚧',
-        lead: '本章建立后续优化会反复用到的 AMD GPU 最小心智模型，同时解释 ROCm 软件栈如何把上层框架连接到硬件。读完后，你应该能看懂后续章节里 CU、Wavefront、LDS、HIP、MIGraphX 等词的位置。',
+        lead: '本章建立后续优化会反复用到的 AMD GPU 硬件最小模型。读完后，你应该能用自己的话讲清楚一个 kernel 在 AMD GPU 上从 launch 到执行经过哪些硬件单元，能区分 RDNA 与 CDNA 在 AI 工作负载上的差异，并知道 gfx1151（AI MAX 395）在两条产品线中的位置。',
         sections: [
-          ['AMD GPU 基本架构', '介绍 CU、Wavefront 和 SIMD 执行模型，建立硬件执行的第一层直觉。'],
-          ['CU、Wavefront、SIMD、LDS、VGPR、SGPR', '解释关键硬件单元，并用后续算子优化会遇到的问题来理解它们。'],
-          ['HBM、Cache 与访存层次', '理解显存带宽、缓存层次和数据复用为什么影响 AI 算子性能。'],
+          ['Compute Unit（CU）的内部结构', '逐层拆解 CU：SIMD / VALU / SALU / Branch / Scalar / Vector 寄存器堆。'],
+          ['Wavefront 与 SIMT 执行', '理解 64 线程一组（RDNA 上 32 或 64）的执行方式以及分支收敛代价。'],
+          ['VGPR、SGPR 与 LDS 资源', '解释片上寄存器与共享内存为什么是 kernel 优化的核心资源。'],
+          ['AMD GPU 演进简史：从 GCN 到 RDNA / CDNA', '用一张时间线串起 TeraScale → GCN → RDNA 1-4 与 CDNA 1-4 的演进，定位 gfx1151 在哪一支。'],
+          ['RDNA vs CDNA 的关键差异', '从面向场景（图形 vs 数据中心）到指令集差异、wavefront 宽度、Tensor 单元的对比。'],
+          ['gfx1151 / AI MAX 395 定位', '说明本书硬件基线 gfx1151 在 RDNA 体系下的位置、能力与差异说明（不替 MI 系列编数据）。'],
+          ['MFMA 与 WMMA：Tensor 加速单元', '介绍 CDNA 上的 MFMA 与 RDNA3+ 上的 WMMA，以及它们在 AI 算子里的角色。'],
+          ['Roofline 的硬件来源', '把硬件参数（峰值算力、带宽）翻译成 Roofline 上的两条线。']
+        ]
+      },
+      {
+        title: '内存层次与访存模式',
+        summary: 'HBM/GDDR/Infinity Cache、L1/L2、LDS bank 冲突、合并访存、atomics 与 fence',
+        status: '🚧',
+        lead: '本章把单卡内存层次拆开。读完后，你应该能解释一个 GPU 内存请求从指令到 HBM 到底走了几跳、哪一步代价最高，并知道为什么"合并访存""LDS bank 冲突"这些词决定了多数 AI 算子的性能上限。所有数字以 AI MAX 395 + ROCm 7.12.0 为基线。',
+        sections: [
+          ['内存层次总览', '从寄存器 → LDS → L1/L2 → Infinity Cache → HBM/GDDR 的容量、带宽、延迟分层。'],
+          ['HBM vs GDDR vs Infinity Cache', '解释三类显存与片上缓存的取舍，以及 gfx1151 上的实际形态。'],
+          ['L1 / L2 Cache 的工作方式', '理解 cacheline 大小、命中策略与共享粒度对算子带宽的影响。'],
+          ['LDS 详解与 bank 冲突', '解释 LDS 的 bank 结构、为什么 stride 选错会让性能腰斩。'],
+          ['全局内存合并访存（Coalescing）', '观察连续线程访问连续地址为什么是带宽利用率的关键。'],
+          ['原子操作与内存一致性', '解释 atomics、fence、memory order 在 reduction、histogram 等算子里的代价。'],
+          ['用 micro-benchmark 测量带宽与延迟', '给出一组可复现的小程序，验证 HBM、L2、LDS 的实测带宽与延迟。']
+        ]
+      },
+      {
+        title: 'ROCm 软件栈与工具链',
+        summary: '驱动、HSA、HIP runtime、算子库、上层框架的分层关系，以及如何用命令检查每一层',
+        status: '🚧',
+        lead: '本章用一张分层图把 ROCm 拆开，让你知道 PyTorch、Triton、MIGraphX 这些上层工具最终怎么走到硬件。读完后，你应该能看懂 rocminfo / rocm-smi / hipcc 的输出在描述哪一层，并能在出问题时迅速定位是哪一层失联。',
+        sections: [
           ['ROCm 是什么', '用分层图理解驱动、运行时、编译器、库和工具链之间的关系。'],
-          ['HIP、HSA、AMDGPU Driver 的关系', '厘清 HIP 程序如何经由运行时和驱动落到设备执行。'],
-          ['PyTorch / Triton / MIGraphX / vLLM 与 ROCm 的关系', '说明上层框架如何依赖 ROCm 能力，但不在本章展开使用细节。'],
-          ['如何检查一台机器的 AMD GPU 环境', '把环境检查命令放回软件栈语境中，解释每个命令在检查什么。']
+          ['AMDGPU Driver、HSA Runtime、HIP Runtime', '厘清三层 runtime 的职责和接口边界。'],
+          ['算子库：rocBLAS / MIOpen / Composable Kernel', '介绍核心库的定位，方便后续 kernel 章节做对比。'],
+          ['编译器侧：HIPCC / LLVM-AMDGPU', '理解 HIP 代码到 ISA 的编译路径。'],
+          ['上层框架与 ROCm 的关系', '说明 PyTorch / Triton / MIGraphX / vLLM 各自依赖哪些 ROCm 能力。'],
+          ['如何检查一台机器的 AMD GPU 环境', '把环境检查命令放回软件栈语境里，解释每个命令在检查什么。']
         ]
       },
       {
-        path: '/part1-hardware-rocm/chapter3/',
-        source: 'docs/part1-hardware-rocm/chapter3/index.md',
-        code: 'code/part1-hardware-rocm/chapter3',
-        title: '第一个 AMD GPU 程序',
-        summary: 'PyTorch ROCm、最小 HIP kernel、baseline benchmark',
+        title: '第一个 AMD GPU 程序与 baseline',
+        summary: 'PyTorch ROCm + 最小 HIP kernel 双路径，建立可复用的 benchmark 习惯',
         status: '🚧',
-        lead: '本章在已经验证环境可用的基础上，带你跑通第一个真正的 AMD GPU 程序。重点不是安装百科，而是建立后续实验都会复用的代码、计时和日志习惯。',
+        lead: '本章在已经验证环境可用、且对硬件与软件栈有基本心智模型的基础上，带你跑通第一个真正的 GPU 程序。重点不是安装百科，而是建立后续所有实验都会复用的代码、计时、日志习惯——所有数字都来自 AI MAX 395 + ROCm 7.12.0 实测。',
         sections: [
-          ['从已经验证的 ROCm 环境开始', '复用第 1 章的环境验证结果，直接进入当前章节代码目录。'],
+          ['从已经验证的环境开始', '复用前面的环境验证结果，直接进入当前章节代码目录。'],
           ['过一遍框架侧 smoke test', '运行一个 PyTorch ROCm tensor 运算，作为进入手写 HIP 程序前的热身。'],
           ['跑通第一个 HIP kernel', '编写、编译并运行一个最小 HIP kernel。'],
           ['建立 baseline benchmark', '用固定输入、热身、重复运行和 GPU event 建立可复查的计时 baseline。'],
@@ -111,9 +126,6 @@ export const parts = [
     readmeTitle: '第 2 篇：性能分析与瓶颈定位',
     chapters: [
       {
-        path: '/part2-profiling/chapter1/',
-        source: 'docs/part2-profiling/chapter1/index.md',
-        code: 'code/part2-profiling/chapter1',
         title: '性能优化的基本方法论',
         summary: 'Latency、Throughput、Bandwidth、FLOPS、Roofline、可信 benchmark',
         status: '🚧',
@@ -128,9 +140,6 @@ export const parts = [
         ]
       },
       {
-        path: '/part2-profiling/chapter2/',
-        source: 'docs/part2-profiling/chapter2/index.md',
-        code: 'code/part2-profiling/chapter2',
         title: '用一个慢算子跑通 Profiling 闭环',
         summary: '同一案例贯穿 benchmark、rocprof、PyTorch Profiler、瓶颈判断',
         status: '🚧',
@@ -145,9 +154,6 @@ export const parts = [
         ]
       },
       {
-        path: '/part2-profiling/chapter3/',
-        source: 'docs/part2-profiling/chapter3/index.md',
-        code: 'code/part2-profiling/chapter3',
         title: '建立你的第一个性能分析报告',
         summary: '采集数据、判断瓶颈、提出假设、生成 Markdown 报告',
         status: '🚧',
@@ -162,9 +168,6 @@ export const parts = [
         ]
       },
       {
-        path: '/part2-profiling/chapter4/',
-        source: 'docs/part2-profiling/chapter4/index.md',
-        code: 'code/part2-profiling/chapter4',
         title: 'Omniperf 与硬件计数器进阶',
         summary: '用进阶计数器解释访存、Occupancy、波前行为和 Roofline 证据',
         status: '🚧',
@@ -187,9 +190,6 @@ export const parts = [
     readmeTitle: '第 3 篇：HIP 算子优化实战',
     chapters: [
       {
-        path: '/part3-hip-kernels/chapter1/',
-        source: 'docs/part3-hip-kernels/chapter1/index.md',
-        code: 'code/part3-hip-kernels/chapter1',
         title: 'HIP 编程基础',
         summary: 'Kernel、Thread、Block、Grid、Host / Device、内存管理',
         status: '🚧',
@@ -205,9 +205,6 @@ export const parts = [
         ]
       },
       {
-        path: '/part3-hip-kernels/chapter2/',
-        source: 'docs/part3-hip-kernels/chapter2/index.md',
-        code: 'code/part3-hip-kernels/chapter2',
         title: '从 Vector Add 理解 GPU 并行',
         summary: 'CPU baseline、Naive HIP、线程映射、访存合并、benchmark',
         status: '🚧',
@@ -223,9 +220,6 @@ export const parts = [
         ]
       },
       {
-        path: '/part3-hip-kernels/chapter3/',
-        source: 'docs/part3-hip-kernels/chapter3/index.md',
-        code: 'code/part3-hip-kernels/chapter3',
         title: 'Reduction 优化',
         summary: 'Naive Reduction、LDS、Wavefront、多阶段 Reduction、性能对比',
         status: '🚧',
@@ -241,9 +235,6 @@ export const parts = [
         ]
       },
       {
-        path: '/part3-hip-kernels/chapter4/',
-        source: 'docs/part3-hip-kernels/chapter4/index.md',
-        code: 'code/part3-hip-kernels/chapter4',
         title: 'Softmax 优化',
         summary: '数值稳定性、访存优化、Block 级并行、PyTorch 对齐',
         status: '🚧',
@@ -259,9 +250,6 @@ export const parts = [
         ]
       },
       {
-        path: '/part3-hip-kernels/chapter5/',
-        source: 'docs/part3-hip-kernels/chapter5/index.md',
-        code: 'code/part3-hip-kernels/chapter5',
         title: 'LayerNorm 优化',
         summary: '均值方差、Reduction + Normalize 融合、向量化读写、性能分析',
         status: '🚧',
@@ -276,9 +264,6 @@ export const parts = [
         ]
       },
       {
-        path: '/part3-hip-kernels/chapter6/',
-        source: 'docs/part3-hip-kernels/chapter6/index.md',
-        code: 'code/part3-hip-kernels/chapter6',
         title: 'Matmul 入门优化',
         summary: 'Naive GEMM、Tiling、LDS 缓存、Register Blocking、rocBLAS 差距观察',
         status: '🚧',
@@ -303,9 +288,6 @@ export const parts = [
     readmeTitle: '第 4 篇：Triton on AMD 与自动调参',
     chapters: [
       {
-        path: '/part4-triton/chapter1/',
-        source: 'docs/part4-triton/chapter1/index.md',
-        code: 'code/part4-triton/chapter1',
         title: 'Triton 编程模型',
         summary: 'Triton vs HIP、program model、block 级张量、AMD 环境验证',
         status: '🚧',
@@ -319,9 +301,6 @@ export const parts = [
         ]
       },
       {
-        path: '/part4-triton/chapter2/',
-        source: 'docs/part4-triton/chapter2/index.md',
-        code: 'code/part4-triton/chapter2',
         title: 'Triton Matmul 优化',
         summary: 'Triton GEMM、tile 设计、数据复用、benchmark、HIP / rocBLAS 对比',
         status: '🚧',
@@ -337,9 +316,6 @@ export const parts = [
         ]
       },
       {
-        path: '/part4-triton/chapter3/',
-        source: 'docs/part4-triton/chapter3/index.md',
-        code: 'code/part4-triton/chapter3',
         title: 'Triton Softmax 优化',
         summary: '行级 Softmax、数值稳定、block reduction、访存优化、PyTorch 对齐',
         status: '🚧',
@@ -355,9 +331,6 @@ export const parts = [
         ]
       },
       {
-        path: '/part4-triton/chapter4/',
-        source: 'docs/part4-triton/chapter4/index.md',
-        code: 'code/part4-triton/chapter4',
         title: 'Triton Attention 优化',
         summary: 'QK^T、Softmax、PV、分块注意力、显存访问、可复现实验边界',
         status: '🚧',
@@ -373,9 +346,6 @@ export const parts = [
         ]
       },
       {
-        path: '/part4-triton/chapter5/',
-        source: 'docs/part4-triton/chapter5/index.md',
-        code: 'code/part4-triton/chapter5',
         title: 'Triton 自动调参',
         summary: '搜索空间、autotune、自动 benchmark、选择最优 kernel config',
         status: '🚧',
@@ -393,32 +363,27 @@ export const parts = [
   },
   {
     prefix: '/part5-inference/',
-    navText: '推理优化',
-    title: '推理优化与模型部署',
-    readmeTitle: '第 5 篇：推理优化与模型部署',
+    navText: '单卡推理',
+    title: '单卡推理与毕业项目',
+    readmeTitle: '第 5 篇：单卡推理与毕业项目',
     chapters: [
       {
-        path: '/part5-inference/chapter1/',
-        source: 'docs/part5-inference/chapter1/index.md',
-        code: 'code/part5-inference/chapter1',
-        title: '推理优化全景',
-        summary: '延迟、吞吐、精度、batch、并发、端到端 pipeline',
+        title: '单卡推理性能全景',
+        summary: '延迟、吞吐、精度、batch、单卡端到端 pipeline；明确单卡能解 vs 不能解的问题',
         status: '🚧',
-        lead: '本章从端到端服务视角理解推理优化，不只盯着单个 kernel。读完后，你应该能区分模型计算、预处理、后处理、数据传输和服务调度各自的开销。',
+        lead: '本章从单卡端到端视角理解推理性能，不只盯着单个 kernel。读完后，你应该能区分模型计算、预处理、后处理、数据传输各自的开销，并知道哪些问题在单卡上可解、哪些必须等 hello-mlsys（多副本/动态 batching/多卡通信）和 hello-ai-infra（服务化/集群部署）。',
         sections: [
           ['训练和推理的差异', '说明推理为什么更关注延迟、吞吐、稳定性和资源利用率。'],
-          ['Latency 与 Throughput', '定义端到端延迟、单请求延迟和系统吞吐。'],
-          ['Batch、并发与吞吐', '理解 batch size 和并发请求对性能的影响。'],
+          ['Latency 与 Throughput', '定义端到端延迟、单请求延迟和单卡吞吐。'],
+          ['Batch 与吞吐（单卡视角）', '理解 batch size 对单卡性能的影响（不展开多请求调度）。'],
           ['FP32 / FP16 / BF16 / INT8', '介绍精度选择和量化对推理性能的影响边界。'],
-          ['模型加载、预处理、后处理与服务开销', '把非模型计算也纳入性能分析范围。'],
-          ['端到端推理 pipeline', '画出从输入到输出的完整路径。']
+          ['模型加载、预处理、后处理开销', '把非模型计算也纳入性能分析范围。'],
+          ['端到端推理 pipeline', '画出从输入到输出的完整路径。'],
+          ['单卡能解 vs 不能解的问题', '明确多副本、动态 batching、多卡通信交给后续两本书。']
         ]
       },
       {
-        path: '/part5-inference/chapter2/',
-        source: 'docs/part5-inference/chapter2/index.md',
-        code: 'code/part5-inference/chapter2',
-        title: 'ONNX Runtime / MIGraphX 工具实战',
+        title: 'ONNX Runtime 与 MIGraphX 实战',
         summary: 'ONNX 导出、ROCm 推理、MIGraphX 运行、工具层性能对比',
         status: '🚧',
         lead: '本章只站在工具使用者角度，带你把模型导出、加载、运行并做性能对比。图优化为什么有效会留到编译器篇讲，这里重点是怎么正确使用和记录结果。',
@@ -426,61 +391,52 @@ export const parts = [
           ['ONNX 模型导出', '从 PyTorch 模型导出 ONNX，并检查输入输出签名。'],
           ['ONNX Runtime on ROCm', '在 ROCm 环境下运行 ONNX Runtime，并记录基线性能。'],
           ['MIGraphX 基础运行', '使用 MIGraphX 加载和执行模型，观察工具链差异。'],
-          ['开启工具层优化选项', '只介绍如何使用优化选项，不在本章展开优化原理。'],
+          ['开启工具层优化选项', '只介绍如何使用优化选项，并把效果与编译器篇原理对应。'],
           ['模型推理性能对比', '用相同输入和指标比较 PyTorch、ONNX Runtime、MIGraphX。'],
           ['结果记录与风险说明', '标注硬件、版本、模型和已验证边界。']
         ]
       },
       {
-        path: '/part5-inference/chapter3/',
-        source: 'docs/part5-inference/chapter3/index.md',
-        code: 'code/part5-inference/chapter3',
-        title: 'Triton Inference Server on AMD',
-        summary: 'Model Repository、Backend、HTTP / gRPC、动态 batching、端到端测试',
+        title: '视觉模型推理案例：YOLO',
+        summary: '图像预处理、NMS、单卡 batch 推理、pipeline profiling、性能报告',
         status: '🚧',
-        lead: '本章把单机推理程序放进服务化框架中，观察服务层如何影响端到端性能。读完后，你应该能搭建最小 Model Repository，并用统一请求方式测试服务性能。',
-        sections: [
-          ['Triton Server 是什么', '理解推理服务和本地脚本的差异。'],
-          ['Model Repository 结构', '组织模型文件、配置和版本目录。'],
-          ['Python Backend / ONNX Backend / 自定义 Backend', '比较不同 backend 的定位和适用场景。'],
-          ['gRPC / HTTP 调用', '用客户端发起请求并记录响应延迟。'],
-          ['动态 batching', '观察动态 batch 对吞吐和延迟的影响。'],
-          ['端到端性能测试', '把模型计算和服务开销放在同一份报告里。']
-        ]
-      },
-      {
-        path: '/part5-inference/chapter4/',
-        source: 'docs/part5-inference/chapter4/index.md',
-        code: 'code/part5-inference/chapter4',
-        title: 'YOLO 推理优化案例',
-        summary: '图像预处理、NMS、batch 推理、pipeline profiling、性能报告',
-        status: '🚧',
-        lead: '本章选择 YOLO 作为端到端视觉推理案例，练习从模型外部开销到 GPU kernel 的完整分析。读完后，你应该能知道一个推理 pipeline 慢，不一定是模型本身慢。',
+        lead: '本章用 YOLO 作为单卡视觉推理案例，练习从模型外部开销到 GPU kernel 的完整分析。读完后，你应该能确认一个推理 pipeline 慢，不一定是模型本身慢，所有数字均在 AI MAX 395 + ROCm 7.12.0 上实测。',
         sections: [
           ['YOLO 模型部署', '准备模型、输入图片和最小推理脚本。'],
           ['图像预处理优化', '分析 resize、normalize、layout transform 等 CPU/GPU 开销。'],
           ['后处理 NMS 优化', '观察 NMS 是否成为端到端瓶颈。'],
-          ['Batch 推理', '测试 batch size 对吞吐和延迟的影响。'],
-          ['Pipeline profiling', '把预处理、模型、后处理和服务开销拆开记录。'],
+          ['Batch 推理（单卡范围）', '测试单卡上 batch size 对吞吐和延迟的影响。'],
+          ['Pipeline profiling', '把预处理、模型、后处理开销拆开记录。'],
           ['性能报告', '输出一份包含瓶颈判断和下一步计划的案例报告。']
         ]
       },
       {
-        path: '/part5-inference/chapter5/',
-        source: 'docs/part5-inference/chapter5/index.md',
-        code: 'code/part5-inference/chapter5',
-        title: 'LLM 推理性能分析入门',
-        summary: 'Prefill、Decode、TTFT、TPOT、KV Cache、显存观测、batch / 并发',
+        title: 'LLM 单卡推理性能分析入门',
+        summary: 'Prefill、Decode、TTFT、TPOT、KV Cache、显存观测；多卡/多请求留给 hello-mlsys',
         status: '🚧',
-        lead: '本章降低对完整 vLLM 优化的承诺，先建立 LLM 推理性能分析的基本框架。读完后，你应该能观察 TTFT、TPOT、KV Cache 和显存占用，并理解后续是否引入 vLLM 需要先实测确认。',
+        lead: '本章建立 LLM 推理性能分析的基本框架，只覆盖单卡视角。读完后，你应该能在 AI MAX 395 + ROCm 7.12.0 上观察 TTFT、TPOT、KV Cache 和单卡显存占用，并理解 vLLM 多请求调度、PagedAttention、多卡 TP 推理等内容为什么留给 hello-mlsys。',
         sections: [
-          ['LLM 推理流程', '拆解 tokenizer、prefill、decode、采样和输出后处理。'],
+          ['LLM 推理流程', '拆解 tokenizer、prefill、decode、采样、输出后处理。'],
           ['Prefill 与 Decode', '理解两个阶段的计算形态和性能指标差异。'],
-          ['TTFT、TPOT 与吞吐', '定义 LLM 推理中更常用的延迟和吞吐指标。'],
-          ['KV Cache 与显存占用', '观察上下文长度、batch 和 cache 对显存的影响。'],
-          ['小模型推理 benchmark', '选择能在当前硬件上稳定运行的模型做可复现实验。'],
-          ['Batch 与并发', '分析批处理和并发请求对延迟、吞吐和显存的影响。'],
-          ['vLLM on AMD 的验证边界', '把 vLLM 作为待实测或可选路线，不在未验证前承诺优化结果。']
+          ['TTFT、TPOT 与单卡吞吐', '定义 LLM 推理中常用的延迟和吞吐指标。'],
+          ['KV Cache 与显存占用', '观察上下文长度、batch、cache 对单卡显存的影响。'],
+          ['小模型推理 benchmark', '选择能在 AI MAX 395 上稳定运行的模型做可复现实验。'],
+          ['单卡边界与下一步', '明确多副本、并发调度、动态 batching、多卡 TP 推理留给 hello-mlsys / hello-ai-infra。']
+        ]
+      },
+      {
+        title: '毕业项目：单卡 GPU 性能诊断报告',
+        summary: '结合前 4 篇能力，对一个真实模型出一份单卡性能诊断与优化报告',
+        status: '🚧',
+        lead: '本章是全书的毕业项目。读完后，你应该能挑选一个真实模型，从硬件特征采集、baseline benchmark、profiling、瓶颈判断、优化尝试、对比验证、报告输出走完一个完整闭环——所有结果都在 AI MAX 395 + ROCm 7.12.0 上实测。',
+        sections: [
+          ['项目目标与验收标准', '定义毕业项目要解决的问题和最终输出。'],
+          ['硬件画像与环境记录', '采集 GPU、ROCm、显存等硬件上下文。'],
+          ['选择模型与定义 baseline', '在小 LLM 或 YOLO 中挑选一个，固定输入与指标。'],
+          ['分层 profiling', '分别从 framework、kernel、硬件计数器三层收集证据。'],
+          ['提出并验证优化', '至少尝试一个 kernel 替换或图优化，对比验证。'],
+          ['输出诊断报告', '形成包含命令、日志、对比表格、风险说明的最终报告。'],
+          ['延伸阅读：通向 hello-mlsys / hello-ai-infra', '说明哪些问题超出单卡范围，需要进入后续两本书。']
         ]
       }
     ]
@@ -492,9 +448,6 @@ export const parts = [
     readmeTitle: '第 6 篇：AI 编译器与自动调优',
     chapters: [
       {
-        path: '/part6-compiler/chapter1/',
-        source: 'docs/part6-compiler/chapter1/index.md',
-        code: 'code/part6-compiler/chapter1',
         title: 'AI 编译器到底在优化什么',
         summary: '模型图、计算图、算子、kernel、ISA、手写优化关系',
         status: '🚧',
@@ -508,9 +461,6 @@ export const parts = [
         ]
       },
       {
-        path: '/part6-compiler/chapter2/',
-        source: 'docs/part6-compiler/chapter2/index.md',
-        code: 'code/part6-compiler/chapter2',
         title: '图优化原理基础',
         summary: '算子融合、常量折叠、死代码消除、布局优化、Memory Planning 原理',
         status: '🚧',
@@ -525,9 +475,6 @@ export const parts = [
         ]
       },
       {
-        path: '/part6-compiler/chapter3/',
-        source: 'docs/part6-compiler/chapter3/index.md',
-        code: 'code/part6-compiler/chapter3',
         title: 'Kernel 生成与调度搜索',
         summary: 'Schedule 原语、搜索空间、Cost Model、AutoScheduler、硬件反馈',
         status: '🚧',
@@ -542,9 +489,6 @@ export const parts = [
         ]
       },
       {
-        path: '/part6-compiler/chapter4/',
-        source: 'docs/part6-compiler/chapter4/index.md',
-        code: 'code/part6-compiler/chapter4',
         title: 'TVM / Triton / MIGraphX 对比',
         summary: '三个工具的定位、适用问题和选择指南',
         status: '🚧',
@@ -558,150 +502,27 @@ export const parts = [
         ]
       }
     ]
-  },
-  {
-    prefix: '/part7-agent/',
-    navText: 'Agent',
-    title: 'AutoInfra Agent 自动优化系统',
-    readmeTitle: '第 7 篇：AutoInfra Agent 自动优化系统',
-    chapters: [
-      {
-        path: '/part7-agent/chapter1/',
-        source: 'docs/part7-agent/chapter1/index.md',
-        code: 'code/part7-agent/chapter1',
-        title: '为什么 AI Infra 需要 Agent',
-        summary: '人类优化流程、可自动化环节、LLM 角色、AutoInfra 总架构',
-        status: '🚧',
-        lead: '本章解释为什么 Agent 适合作为全书终点：它不是替代 profiling，而是把已经学过的 benchmark、profiling、优化假设和报告流程自动串起来。',
-        sections: [
-          ['人类优化专家的工作流', '复盘一个工程师从发现慢到验证优化的完整流程。'],
-          ['哪些步骤可以自动化', '区分命令执行、日志解析、报告生成和代码修改等自动化边界。'],
-          ['LLM 在优化流程里的角色', '说明 LLM 适合做解释、规划和代码候选，但不能替代实测。'],
-          ['Agent 不能替代 profiling，但可以放大 profiling 的价值', '强调实验真实性和硬件反馈仍然是判断依据。'],
-          ['AutoInfra Agent 总架构', '预览后续章节将逐步搭建的系统闭环。']
-        ]
-      },
-      {
-        path: '/part7-agent/chapter2/',
-        source: 'docs/part7-agent/chapter2/index.md',
-        code: 'code/part7-agent/chapter2',
-        title: '实验资产与数据结构',
-        summary: '硬件画像、实验配置、benchmark 结果、profiling 输出、报告数据模型',
-        status: '🚧',
-        lead: '本章先定义 Agent 系统要读写哪些数据，而不是急着写多个 Agent 类。读完后，你应该能理解硬件信息、实验配置、日志和报告之间如何关联。',
-        sections: [
-          ['硬件画像', '记录 GPU 型号、ROCm 版本、显存和关键能力。'],
-          ['实验配置', '描述输入规模、命令、参数、版本和运行时间。'],
-          ['Benchmark 结果', '规范 latency、throughput、memory 等指标的保存方式。'],
-          ['Profiling 输出', '保存 timeline、kernel 表和硬件计数器摘要。'],
-          ['报告数据模型', '把实验资产组织成后续 Agent 可以消费的结构。']
-        ]
-      },
-      {
-        path: '/part7-agent/chapter3/',
-        source: 'docs/part7-agent/chapter3/index.md',
-        code: 'code/part7-agent/chapter3',
-        title: '自动 Benchmark 与 Profiling 数据管线',
-        summary: '自动运行 benchmark、调用 profiling、保存结果、对比版本',
-        status: '🚧',
-        lead: '本章搭建系统闭环的第一段：让程序能自动运行实验并收集性能证据。读完后，你应该能把手工 benchmark 和 profiling 变成可重复调用的数据管线。',
-        sections: [
-          ['自动运行 benchmark', '把固定命令封装成可重复执行的任务。'],
-          ['自动记录 latency / throughput / memory', '统一指标格式和日志路径。'],
-          ['自动调用 profiling 工具', '根据配置调用 rocprof、PyTorch Profiler 或 Omniperf。'],
-          ['自动保存实验结果', '把原始输出和摘要结果一起落盘。'],
-          ['自动对比不同版本', '比较 baseline 与候选版本的关键指标。']
-        ]
-      },
-      {
-        path: '/part7-agent/chapter4/',
-        source: 'docs/part7-agent/chapter4/index.md',
-        code: 'code/part7-agent/chapter4',
-        title: '瓶颈判断与优化计划',
-        summary: 'Memory-bound / Compute-bound 判断、优化候选、优先级排序、实验计划',
-        status: '🚧',
-        lead: '本章让 Agent 从“收集数据”走向“提出下一步”。读完后，你应该能把 profiling 摘要转成结构化瓶颈判断和可执行实验计划。',
-        sections: [
-          ['判断 Memory-bound / Compute-bound', '把指标和方法论映射到瓶颈类型。'],
-          ['生成优化候选', '根据瓶颈类型生成可能的改动方向。'],
-          ['给优化策略排序', '根据预期收益、实现成本和风险排列优先级。'],
-          ['生成实验计划', '把优化候选变成可运行命令、输入和验收指标。'],
-          ['记录不确定性', '明确哪些判断只是假设，必须通过实验确认。']
-        ]
-      },
-      {
-        path: '/part7-agent/chapter5/',
-        source: 'docs/part7-agent/chapter5/index.md',
-        code: 'code/part7-agent/chapter5',
-        title: '代码修改、运行与回滚',
-        summary: '生成候选代码、自动插入 benchmark、检查编译错误、失败回滚',
-        status: '🚧',
-        lead: '本章进入最敏感的一步：让 Agent 修改代码。读完后，你应该理解为什么自动改代码必须和编译、测试、benchmark、回滚绑定在一起。',
-        sections: [
-          ['自动修改 Triton 参数', '从低风险的参数搜索开始练习代码改动。'],
-          ['自动生成 HIP kernel 候选', '生成候选实现，但必须经过编译和运行验证。'],
-          ['自动插入 benchmark 代码', '保证候选版本能用统一脚本测量。'],
-          ['自动检查编译错误', '把失败信息转成下一步修复或放弃的依据。'],
-          ['自动回滚失败版本', '避免失败候选污染后续实验。']
-        ]
-      },
-      {
-        path: '/part7-agent/chapter6/',
-        source: 'docs/part7-agent/chapter6/index.md',
-        code: 'code/part7-agent/chapter6',
-        title: '报告生成与实验追踪',
-        summary: 'before / after 表格、失败尝试、证据链、下一步优化方向',
-        status: '🚧',
-        lead: '本章把自动优化的结果变成可读、可审查、可复现的报告。读完后，你应该能让 Agent 不只给结论，还给出支撑结论的命令、日志和失败尝试。',
-        sections: [
-          ['自动生成优化报告', '把实验配置、硬件上下文和结果汇总成 Markdown。'],
-          ['自动生成 before / after 表格', '清楚展示候选版本与 baseline 的差异。'],
-          ['自动记录失败尝试', '保留失败路径，避免重复试错。'],
-          ['自动总结下一步优化方向', '根据当前证据提出后续实验，而不是给绝对结论。'],
-          ['报告的可信度边界', '说明哪些结论来自实测，哪些只是待验证假设。']
-        ]
-      },
-      {
-        path: '/part7-agent/chapter7/',
-        source: 'docs/part7-agent/chapter7/index.md',
-        code: 'code/part7-agent/chapter7',
-        title: '最小 AutoInfra Agent 系统',
-        summary: '把硬件采集、benchmark、profiling、计划、执行和报告串成闭环',
-        status: '🚧',
-        lead: '本章把前面分散的模块串成一个能跑的最小系统。读完后，你应该能从一个输入任务开始，让系统完成一次小规模自动性能分析和报告生成。',
-        sections: [
-          ['系统输入输出设计', '定义用户任务、代码路径、实验配置和报告输出。'],
-          ['工作流编排', '把硬件采集、benchmark、profiling、计划、执行和报告串起来。'],
-          ['状态与中间产物', '管理日志、候选版本、实验结果和失败记录。'],
-          ['最小端到端运行', '选择一个低风险算子跑通完整闭环。'],
-          ['系统限制', '明确当前系统不能自动承诺性能提升，必须依赖实测。']
-        ]
-      },
-      {
-        path: '/part7-agent/chapter8/',
-        source: 'docs/part7-agent/chapter8/index.md',
-        code: 'code/part7-agent/chapter8',
-        title: '毕业项目：AutoInfra Agent 完整案例',
-        summary: '完整系统、Triton Softmax、YOLO pipeline、AMD GPU 性能诊断报告',
-        status: '🚧',
-        lead: '本章是全书毕业项目，把前面所有能力组合成 AutoInfra Agent 的完整案例。读完后，你应该能理解一个自动优化系统如何从问题、实验、代码、数据和报告五个方面闭环。',
-        sections: [
-          ['项目目标', '定义毕业项目要解决的问题和验收标准。'],
-          ['系统架构', '展示各模块如何连接成完整系统。'],
-          ['输入输出设计', '明确用户输入、实验产物、代码候选和最终报告。'],
-          ['完整运行流程', '串联一次端到端自动优化尝试。'],
-          ['案例一：自动调优 Triton Softmax', '从较可控的 Triton 参数搜索开始。'],
-          ['案例二：自动优化 YOLO 推理 pipeline', '把 Agent 应用到端到端推理链路。'],
-          ['案例三：自动生成 AMD GPU 性能诊断报告', '生成包含硬件、profiling 和建议的诊断报告。']
-        ]
-      }
-    ]
   }
 ]
 
 export function numberedChapters() {
   let number = 0
-  return parts.flatMap((part) => part.chapters.map((chapter) => ({ ...chapter, part, number: number++ })))
+  return parts.flatMap((part) =>
+    part.chapters.map((chapter) => {
+      const chapterNumber = number++
+      const partSlug = part.prefix.replace(/^\/|\/$/g, '')
+      const chapterDir = `chapter${chapterNumber}`
+
+      return {
+        ...chapter,
+        part,
+        number: chapterNumber,
+        path: `${part.prefix}${chapterDir}/`,
+        source: `docs/${partSlug}/${chapterDir}/index.md`,
+        code: `code/${partSlug}/${chapterDir}`,
+      }
+    }),
+  )
 }
 
 export const chapters = numberedChapters()
@@ -710,20 +531,19 @@ export const bodyPartCount = parts.length - 1
 
 export const navItems = [
   { text: '首页', link: '/' },
-  { text: '全书目录', link: '/part0-preface/chapter1/' },
-  { text: '学习路线', link: '/part0-preface/chapter1/#_0-6-学习路线图' },
-  { text: '实验环境', link: '/part0-preface/chapter2/' },
+  { text: '全书目录', link: '/part0-preface/chapter0/' },
+  { text: '学习路线', link: '/part0-preface/chapter0/#_0-6-学习路线图' },
+  { text: '实验环境', link: '/part0-preface/chapter1/' },
   { text: 'GitHub', link: 'https://github.com/Weihong-Liu/hello-ai-infra' },
 ]
 
 export const sidebar = parts.map((part) => ({
   text: part.readmeTitle,
   collapsed: false,
-  items: part.chapters.map((chapter) => {
-    const numbered = chapters.find((item) => item.path === chapter.path)
-    return {
-      text: `第 ${numbered.number} 章 ${chapter.title}`,
+  items: chapters
+    .filter((chapter) => chapter.part.prefix === part.prefix)
+    .map((chapter) => ({
+      text: `第 ${chapter.number} 章 ${chapter.title}`,
       link: chapter.path,
-    }
-  }),
+    })),
 }))

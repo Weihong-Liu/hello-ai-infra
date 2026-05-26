@@ -1,0 +1,24 @@
+"Correlation_Id","Dispatch_Id","Agent_Id","Queue_Id","Process_Id","Thread_Id","Grid_Size","Kernel_Id","Kernel_Name","Workgroup_Size","LDS_Block_Size","Scratch_Size","VGPR_Count","Accum_VGPR_Count","SGPR_Count","Counter_Name","Counter_Value","Start_Timestamp","End_Timestamp"
+1,1,"Agent 1",1,998653,998653,1024,6,"__amd_rocclr_copyBuffer",512,0,0,16,0,128,"WRITE_SIZE",8.000000,6125233140800878,6125233140805807
+2,2,"Agent 1",1,998653,998653,1024,6,"__amd_rocclr_copyBuffer",512,0,0,16,0,128,"WRITE_SIZE",8.000000,6125233140855470,6125233140857915
+3,3,"Agent 1",1,998653,998653,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"WRITE_SIZE",8.000000,6125233141392344,6125233141828928
+4,4,"Agent 1",1,998653,998653,4194304,19,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"WRITE_SIZE",8.000000,6125233141849527,6125233142196582
+5,5,"Agent 1",1,998653,998653,4194304,17,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"WRITE_SIZE",32341.375000,6125233142216580,6125233142746501
+6,6,"Agent 1",1,998653,998653,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"WRITE_SIZE",8.000000,6125233142769785,6125233143173788
+7,7,"Agent 1",1,998653,998653,4194304,19,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"WRITE_SIZE",8.000000,6125233143194988,6125233143543285
+8,8,"Agent 1",1,998653,998653,4194304,17,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"WRITE_SIZE",32349.375000,6125233143565287,6125233144091440
+9,9,"Agent 1",1,998653,998653,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"WRITE_SIZE",8.000000,6125233144133530,6125233144541500
+10,10,"Agent 1",1,998653,998653,4194304,19,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"WRITE_SIZE",8.000000,6125233144562460,6125233144910757
+11,11,"Agent 1",1,998653,998653,4194304,17,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"WRITE_SIZE",32337.750000,6125233144932038,6125233145458872
+12,12,"Agent 1",1,998653,998653,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"WRITE_SIZE",8.000000,6125233145484200,6125233145890487
+13,13,"Agent 1",1,998653,998653,4194304,19,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"WRITE_SIZE",8.000000,6125233145911808,6125233146259103
+14,14,"Agent 1",1,998653,998653,4194304,17,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"WRITE_SIZE",32338.250000,6125233146280023,6125233146805776
+15,15,"Agent 1",1,998653,998653,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"WRITE_SIZE",8.000000,6125233146830703,6125233147232461
+16,16,"Agent 1",1,998653,998653,4194304,19,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"WRITE_SIZE",8.000000,6125233147255024,6125233147601558
+17,17,"Agent 1",1,998653,998653,4194304,17,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"WRITE_SIZE",32358.000000,6125233147623199,6125233148148150
+18,18,"Agent 1",1,998653,998653,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"WRITE_SIZE",8.000000,6125233148172757,6125233148578523
+19,19,"Agent 1",1,998653,998653,4194304,19,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"WRITE_SIZE",8.000000,6125233148600124,6125233148948101
+20,20,"Agent 1",1,998653,998653,4194304,17,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"WRITE_SIZE",32351.625000,6125233148970102,6125233149496015
+21,21,"Agent 1",1,998653,998653,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"WRITE_SIZE",8.000000,6125233149520101,6125233149927710
+22,22,"Agent 1",1,998653,998653,4194304,19,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"WRITE_SIZE",8.000000,6125233149949512,6125233150298290
+23,23,"Agent 1",1,998653,998653,4194304,17,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"WRITE_SIZE",32356.125000,6125233150319170,6125233150844441

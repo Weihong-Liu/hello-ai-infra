@@ -1,328 +1,306 @@
 ---
-title: "第3章 AMD GPU 与 ROCm 软件栈"
-description: "Hello AI Infra 第3章 · AMD GPU 执行模型、ROCm 层次、上层框架关系"
+title: "第2章 GPU 在 AI 中的位置"
+description: "Hello GPU 第2章 · 从一次推理请求出发，把模型、框架、算子、kernel、runtime、硬件串成单卡视角的链路图"
 ---
 
-# 第3章 AMD GPU 与 ROCm 软件栈
+# 第2章 GPU 在 AI 中的位置
 
 ## 本章导读
 
-> 上一章我们站在一次推理请求的视角，把 AI Infra 的整条链路从头看到了尾。这一章，我们把镜头往下推，对准链路最底层的那块地基——AMD GPU 和 ROCm 软件栈本身。
+> **本章是概念地图章节，不需要你立刻执行命令。** 你只需要带着一个问题阅读：当别人说"GPU 没跑满"时，问题可能落在哪一层？
 >
-> 我们不会一上来就钻进所有硬件细节，而是先建立一个**最小可用的心智模型**：GPU 是怎么并行执行的？ROCm 这套软件栈又怎么把上面的 PyTorch、Triton 一路连到硬件？以及后面会反复出现的 CU、Wavefront、LDS、HIP、HSA，分别站在哪一层？读完这一章，再看到这些名词时，你心里至少能给它们对号入座。
+> 如果你还没有完成 [第 1 章](../../part0-preface/chapter1/index.md) 的环境验证，请先确认 GPU 可见、PyTorch ROCm 能运行、最小 HIP 程序能编译通过——本章之后的篇章都会默认这套环境已经就位。
+>
+> 我们会跟着一次推理请求，从最上层的用户输入一路走到最底层的 GPU 执行，把模型、框架、算子、编译器、运行时和硬件串成一条完整的链路。读完这一章，你不一定立刻就能动手优化一个模型，但你会获得一张"AI Infra 地图"——当别人告诉你"它很慢"时，你能心里有底地反问回去：**慢在哪一层？**
 
-[第 2 章](../chapter1/index.md)我们把 AI Infra 看成一条从模型到硬件的链路。同一片地，换一个视角来看：那一章是站在请求角度串模块，本章是站在 AMD / ROCm 角度拆地基。
+很多人刚接触 AI Infra 的时候，会习惯把所有的性能问题都归结为一句话："GPU 没跑满。"——这句话听起来像个结论，但其实只是一个现象。GPU 没跑满，可能是因为数据还没送到 GPU 手里；可能是因为 kernel（GPU 上跑的一段并行代码）太碎，启动开销太大；可能是因为某个算子（一个数学运算的具体实现）不适合当前硬件的执行方式；也可能是因为服务层的 batch（把多个请求攒在一起处理）策略出了问题，GPU 在等活儿干。
 
-如果你只想从这一章带走一句话，可以是这一句：**ROCm 是 AMD GPU 的软件栈，HIP 是你最常直接接触到的编程接口，而真正执行计算的，是 GPU 上成千上万个并行线程。**
+换句话说，没有一张完整的地图，光看一个利用率数字是无法做出判断的。所以在动手优化之前，我们先得把这张地图铺开。
 
-## 3.1 AMD GPU 基本架构
+## 2.1 从模型到硬件：一次推理请求经历了什么
 
-CPU 和 GPU 都能执行程序，但**它们擅长的事完全不一样**。
+先想象一个最普通的模型推理请求：用户发来一段输入，服务端返回模型输出。站在应用层看，这只是一次函数调用；但站在 AI Infra 的视角看，它会穿过很多层。
 
-CPU 更像少数几个很强的工人——能做复杂的判断、灵活地切换任务、处理各种意外。GPU 则像一大群节奏统一的工人——单兵能力一般，但胜在人多、动作整齐，特别擅长"同一件事一次干一万份"（如图 3.1 所示）。
+::: figure fig-request-path
+```mermaid
+flowchart TD
+    A[输入请求] --> B[预处理 / Tokenize]
+    B --> C[模型服务层]
+    C --> D[深度学习框架]
+    D --> E[计算图 / 算子调度]
+    E --> F[算子库 / 自定义 Kernel]
+    F --> G[编译器 / Runtime]
+    G --> H[驱动]
+    H --> I[GPU 硬件执行]
+    I --> J[结果回传]
+    J --> K[后处理 / 返回响应]
+```
 
-![CPU vs GPU 工人对比](./images/cpu-vs-gpu-workers.png)
+一次模型请求从输入到 GPU 执行再到返回的简化路径
+:::
 
-<div align="center">
-  <p>图 3.1 类比示意：CPU 像几位精英工人，GPU 像一支整齐的大型小队</p>
-</div>
+如 @fig-request-path 所示，一次请求并不是“直接跑到 GPU 上”。它先经过服务层和框架层，再变成一个个算子，最后才落到 GPU kernel 上。每一层都有可能成为瓶颈。
 
-这就是为什么深度学习适合 GPU：矩阵乘、卷积、Softmax、Attention 这类计算，本质上都包含大量结构相似的数值运算。
+在继续之前，先认识几个本章会反复出现的关键词：
 
-实际写程序时，CPU 和 GPU 的分工可以画成图 3.2 这条链：
+- **kernel**：GPU 上跑的一段并行代码，可以先理解成"交给 GPU 的一个小任务"；
+- **算子**：一个数学运算的具体实现，比如矩阵乘、Softmax、向量加法；
+- **Runtime**：程序和硬件之间的中间人，负责把任务提交给 GPU、管理内存和同步状态。
 
+后面几节会一口气出现很多术语和工具名。第一次看到不需要全部记住，可以先按下表分层处理：
+
+| 类型 | 术语 | 现在掌握到什么程度 |
+| ---- | ---- | ---- |
+| 本章必须懂 | kernel、算子、Runtime、batch、benchmark、profiling | 知道它们在链路中的位置 |
+| 先知道名字 | TorchInductor、MIGraphX、MLIR、Composable Kernel | 后面章节会展开 |
+| 后续重点讲 | LDS、occupancy、TTFT、TPOT、KV Cache | 现在不用深究 |
+
+判断自己掌握到位的方法很简单：第一行的词，能在脑子里把它放回 @fig-request-path 的哪一格，就算够用。
+
+举几个很常见的例子：
+
+| 现象 | 可能落在哪一层 | 直觉解释 |
+| ---- | ---- | ---- |
+| 单次请求延迟很高 | 服务层 / 推理引擎 / 算子层 | 可能是 batch（攒多个请求一起处理）策略、KV Cache（大模型推理时保存历史上下文的缓存）、某个算子或数据搬运拖慢了整体链路 |
+| GPU 利用率忽高忽低 | 调度层 / Runtime / kernel launch | GPU 可能一直在等 CPU 发任务，或者 kernel launch（启动 GPU 小任务）太频繁、任务太碎 |
+| 某个模型换引擎后变快 | 推理引擎 / 编译器 / 算子库 | 新引擎可能做了图优化、算子融合或更好的内存规划 |
+| 手写 kernel 没有想象中快 | 算子层 / 硬件层 | 访存、并行度、寄存器压力（每个线程临时变量太多）或同步方式（等其他线程完成的方式）可能不合适 |
+| 显存占用突然爆掉 | 模型结构 / 推理引擎 / 内存规划 | 可能是 batch、KV Cache、中间张量或 allocator（内存分配器）策略不合适 |
+| 多卡扩展效果很差 | 通信库 / 并行策略 / 网络拓扑 | 可能是通信开销、负载不均或同步点太多 |
+| benchmark 结果每次波动很大 | 测量方法 / 系统环境 | 可能没有 warmup（预热）、没有同步、输入规模太小，或者后台负载干扰 |
+
+这就是 AI Infra 和“会调用模型”的区别：前者要把问题放回整条链路里看，而不是只盯着最上层 API 或最底层 GPU。
+
+## 2.2 AI Infra 的核心模块
+
+上一节我们跟着一次请求走完了从模型到硬件的完整链路。现在做一个思维实验：把这条链路里的每一层，放进对应的"房间"里。每个房间住着一类工具，回答一类问题。
+
+在拆"房间"之前，先看一眼真实的 ROCm 软件栈是怎么叠起来的——PyTorch、ROCm、HIP、Driver、GPU 不是并列关系，而是一层一层往下落：
+
+::: figure fig-rocm-stack
+```mermaid
+flowchart TD
+    A[Python / PyTorch / Triton] --> B[ROCm Libraries / HIP]
+    B --> C[HIP Runtime / HSA Runtime]
+    C --> D[AMDGPU Driver]
+    D --> E[AMD GPU]
+```
+
+ROCm 软件栈最小视图：上层调用都要经下层翻译，才能落到 GPU
+:::
+
+记住这张图的好处是：以后看到 "rocBLAS 报错"、"HIP Runtime 错误"、"驱动版本不匹配" 这类信息时，你大致能定位它在哪一层、会影响哪些上层调用。
+
+AI Infra 不是一个单独的工具，而是一组围绕”让模型高效运行”的工程能力。下面这张表里有不少陌生的工具名——第一次看完全不用记。你只需要把它当成一张索引地图：知道哪些工具住在哪个房间。等后面真正用到某个工具时，再翻回来对照位置就够了。
+
+| 模块 | 主要回答的问题 | 典型对象 |
+| ---- | ---- | ---- |
+| 模型服务 | 请求怎么进来，怎么排队，怎么返回 | HTTP/gRPC 服务、batch、并发、流式输出 |
+| 深度学习框架 | 模型如何表达，算子如何调度 | PyTorch、TensorFlow、JAX |
+| 算子与 Kernel | GPU 上真正执行什么计算 | Matmul、Softmax、Attention、Reduction |
+| 算子库 | 常见算子有没有高性能实现 | rocBLAS、MIOpen、hipBLAS、Composable Kernel |
+| 编译器 | 能不能自动改写计算图和生成更优代码 | TorchInductor、Triton、MIGraphX、MLIR |
+| Runtime / Driver | 程序如何把任务交给 GPU | HIP Runtime、HSA Runtime、AMDGPU Driver |
+| Profiling / Benchmark | 慢在哪里，证据是什么 | rocprof、PyTorch Profiler、Omniperf |
+| 自动化系统 | 能不能把实验闭环重复跑起来 | benchmark pipeline、报告生成、AutoInfra Agent |
+
+你更需要记住的是：**每个模块都回答不同层次的问题**。
+
+例如 `torch.matmul` 很慢时，至少有几种可能：
+
+1. 输入 shape 不适合当前算子库；
+2. 数据在 CPU 和 GPU 之间来回搬；
+3. 框架调度了很多细碎 kernel；
+4. 当前 GPU 的访存带宽没有被利用好；
+5. 你的测量方式把初始化、编译或数据准备时间也算进去了。
+
+同样是“慢”，背后的处理方式完全不同。AI Infra 的第一步不是马上优化，而是先判断自己站在哪一层。
+
+## 2.3 算子优化、推理优化、编译器优化分别解决什么问题
+
+前面你已经看到，"慢"可能落在很多层。后续章节会反复出现三类优化：算子优化、推理优化、编译器优化。它们都和性能有关，但盯住的层次完全不同。把这三者的边界搞清楚，是 AI Infra 工程师的基本功。
+
+### 算子优化：盯住一个计算单元
+
+可以把算子优化想成调整一辆赛车的某个零件，比如发动机里的一个活塞。车整不整洁先不管，这里只盯住一个小部件能不能更快、更稳。
+
+算子优化关心的是：一个具体 kernel 在 GPU 上跑得够不够好。
+
+典型问题包括：
+
+- 线程如何映射到数据；
+- 全局内存访问是否连续；
+- LDS 是否能复用数据；
+- 寄存器是否太多影响 occupancy；
+- 一个 block / wavefront 的工作量是否合适。
+
+比如后面写 Vector Add、Reduction、Matmul 时，我们会关心每个线程干什么、读写哪些地址、是否有同步，以及数据有没有被重复加载。
+
+### 推理优化：盯住端到端链路
+
+推理优化更像重新设计赛车从起跑到冲线的整套流程：什么时候进站、怎么换胎、什么时候加速、哪里容易排队。单个零件很重要，但整条路线也会拖慢结果。
+
+推理优化关心的是：一次请求从进入系统到返回结果，整体是否高效。
+
+它不只看单个 kernel，还会看：
+
+- batch size 和并发策略；
+- prefill / decode 阶段的差异；
+- KV Cache 占用；
+- 数据预处理和后处理；
+- 模型加载、内存复用和服务调度；
+- TTFT、TPOT、吞吐和尾延迟。
+
+所以推理优化经常会遇到一种情况：单个 kernel 已经不慢，但端到端仍然慢。原因可能在调度、缓存、batch 或服务层。
+
+### 编译器优化：盯住图和程序变换
+
+编译器优化像有个工程师不直接换零件，而是改写图纸：同样的功能，换一种装配顺序，少搬几次材料，可能就更快。
+
+编译器优化关心的是：能不能自动把原始计算图或程序改写成更适合执行的形态。
+
+常见优化包括：
+
+- 算子融合；
+- 常量折叠；
+- 布局变换；
+- memory planning；
+- kernel selection；
+- autotuning。
+
+编译器优化不是魔法。它通常是在“保持语义不变”的前提下，减少不必要的中间结果、减少访存、减少 kernel launch，或者选择更适合当前 shape 和硬件的实现。
+
+下面这张表可以帮你区分三者：
+
+| 优化类型 | 关注对象 | 常见问题 | 后续对应篇章 |
+| ---- | ---- | ---- | ---- |
+| 算子优化 | 单个 kernel / 单个算子 | 这个算子为什么慢 | HIP 算子、Triton 算子 |
+| 推理优化 | 一次请求或一条服务链路 | 端到端延迟和吞吐为什么不理想 | 推理优化与模型部署 |
+| 编译器优化 | 计算图和程序变换 | 能否自动融合、改写、选择实现 | AI 编译器与自动调优 |
+
+如果把所有性能问题都归因于 kernel，很容易走偏。真正的工程判断，是先定位层次，再选择工具。
+
+## 2.4 AI Infra 工程师的核心能力模型
+
+前面我们把优化按对象分成了三类，但一个更根本的问题是：**做这些优化的人**，到底需要哪些能力？这一节就把这个问题答了——它会成为后面所有章节训练的目标。
+
+AI Infra 的学习曲线之所以陡，是因为它横跨了好几层：上面有模型和框架，下面有 runtime 和硬件，中间还有 benchmark、profiling、编译器和工程系统。一眼看上去，要学的东西似乎无穷无尽。
+
+但不用被吓住。你可以先把能力拆成四类，每一类都有明确的训练路径。
+
+| 能力 | 你要能做到什么 | 本教程会怎么训练 |
+| ---- | ---- | ---- |
+| 硬件理解 | 看懂 GPU 执行模型和内存层次 | 从 CU、Wavefront、LDS、访存开始建立直觉 |
+| 测量分析 | 用 benchmark 和 profiling 找证据 | 从简单算子开始，逐步引入 rocprof、PyTorch Profiler、Omniperf |
+| 工程实现 | 写出可运行、可对比的优化版本 | 用 HIP / Triton 实现常见算子和优化实验 |
+| 复现表达 | 把环境、命令、结果和结论写清楚 | 每个实验保留代码、输出和报告结构 |
+
+这四类能力是相互支撑的。只懂硬件但不会测量，很容易凭感觉优化；只会跑 profiler 但不懂硬件，看见指标也不知道意味着什么；只会写代码但不记录实验，过几天就没人知道哪个版本真的更快。
+
+后面的毕业项目也会把这四类能力合在一起：Agent 先读取 benchmark 和 profiling 结果，这是测量分析；再根据硬件和软件栈判断瓶颈，这是硬件理解；然后修改 HIP / Triton / 推理配置，这是工程实现；最后把命令、结果和结论整理成报告，这是复现表达。
+
+AI Infra 不是“背工具名”，而是建立一个稳定的工作方式：先理解系统，再测量，再动手，再复盘。
+
+## 2.5 拿到性能问题时先怎么分诊
+
+理论讲完了，来点实战的。这一节给你一个非常实用的入口：当你手上只有一句”它很慢”时，先不要急着改 kernel，而是像医生分诊一样，先判断问题更像落在哪一层。
+
+::: figure fig-triage
+```mermaid
+flowchart TD
+    A[性能现象] --> B{端到端请求慢吗}
+    B -- 是 --> C{单个 GPU kernel 也慢吗}
+    B -- 否 --> D{benchmark 是否稳定}
+    C -- 是 --> E[看算子实现 / 访存 / 并行度]
+    C -- 否 --> F[看服务层 batch / 调度 / 数据搬运]
+    D -- 否 --> G[先修测量方法: warmup / repeat / synchronize]
+    D -- 是 --> H{显存或通信异常吗}
+    H -- 显存 OOM --> I[看 batch / KV Cache / 中间张量]
+    H -- 多卡扩展差 --> J[看通信库 / 并行策略 / 拓扑]
+    H -- 都不是 --> K[继续收集 profiling 证据]
+```
+
+性能问题的第一轮分诊路径
+:::
+
+如 @fig-triage 所示，分诊的目的不是一次猜中答案，而是避免一开始就跑错方向。如果 benchmark 本身不稳定，就先别谈优化；如果端到端慢但单个 kernel 不慢，就别只盯着算子；如果显存或多卡通信已经异常，问题也未必在单卡计算上。
+
+分诊不是凭感觉，每个问题都对应着可以观察的现象和工具。下表把图里的判断节点摊开成"先看什么、再用什么工具"：
+
+| 分诊问题 | 初学者先看什么 | 后续工具 |
+| ---- | ---- | ---- |
+| 端到端请求慢吗 | 一次请求的总耗时 | 推理 benchmark |
+| 单个 kernel 慢吗 | profiler 里耗时最长的 kernel | rocprof / PyTorch Profiler |
+| benchmark 稳定吗 | 重复多次，结果是否波动很大 | benchmark 脚本（warmup + repeat） |
+| 显存异常吗 | 是否 OOM、显存占用是否在涨 | 框架日志 / 显存监控 |
+
+这里有三个后面会反复出现的新词：
+
+- warmup：正式计时前先跑几次，让缓存、JIT 编译和设备状态进入稳定状态；
+- repeat：同一个实验重复跑多次，不用一次结果下结论；
+- synchronize：GPU 任务通常是异步提交的，计时前后要等 GPU 真的算完。
+
+**小练习**：你用 PyTorch 跑一个模型，发现单次推理 200 ms，CPU 利用率正常但 GPU 利用率只有 30%。按 @fig-triage 的分诊路径，你会先问哪几个问题？（提示：答案不是"优化 kernel"。）
+
+> **参考思路**：先确认 200 ms 是端到端耗时还是只包含 forward；再看输入和 batch 是不是太小、是不是频繁在 CPU/GPU 之间搬数据、计时有没有 `torch.cuda.synchronize()`；这些都排除之后，再用 profiler 看是不是某个 kernel 真的慢。一上来就改 kernel，很可能改了半天发现根本不是它的问题。
+
+如果你是从推理部署方向进来的，[第 6 章](../chapter6/index.md)的 baseline benchmark 习惯比代码本身更值钱。后面整本书的实验都会沿着一条明确的顺序走：**先稳定测量，再判断层次，再动手优化**。
+
+## 2.6 本教程的学习闭环：理解 -> 测量 -> 优化 -> 自动化
+
+分诊只是入口。一旦你判断出问题落在哪一层，真正做下去的时候，会反复走同一个闭环——这一节就把这个闭环讲清楚。
+
+本教程后面会反复使用一个闭环：理解、测量、优化、自动化。为了方便记忆，也可以把它叫做 HPOA：Hardware、Profiling、Optimization、Automation。
+
+::: figure fig-hpoa-loop
 ```mermaid
 flowchart LR
-    A[CPU Host] --> B[准备输入和启动任务]
-    B --> C[GPU Device]
-    C --> D[大量并行线程]
-    D --> E[执行 Kernel]
-    E --> F[写回结果]
-    F --> A
+    A[Hardware: 理解硬件和系统] --> B[Profiling: 设计测量并收集证据]
+    B --> C[Optimization: 提出假设并修改实现]
+    C --> D[Automation: 固化流程和报告]
+    D --> B
 ```
 
-<div align="center">
-  <p>图 3.2 CPU 负责调度，GPU 负责大规模并行执行</p>
-</div>
+HPOA：本教程反复使用的 AI Infra 学习闭环
+:::
 
-如图 3.2 所示，CPU 侧通常负责准备数据、分配显存、启动 kernel；GPU 侧负责执行真正的大规模并行计算。
+如 @fig-hpoa-loop 所示，这不是一条直线，而是一个循环。你不会只测一次，也不会只优化一次。每一次修改都要回到测量，确认它是否真的改善了目标指标。
 
-在 AMD GPU 上，你后面会反复遇到几个词。可以先把它们当成一个工厂里的角色清单：
+后续篇章大致会沿着这个顺序展开：
 
-| 名词 | 工厂类比 | 技术含义 |
-| ---- | ---- | ---- |
-| Kernel | 写给 GPU 的菜谱 | 跑在 GPU 上的一段并行函数 |
-| Work-item / Thread | 具体干活的工人 | 最小的并行执行单元之一 |
-| Wavefront | 按同一个节拍干活的班组 | 一组一起调度执行的线程 |
-| CU | 车间里的一条流水线 | Compute Unit，GPU 上执行 wavefront 的核心单元 |
-| LDS | 流水线工人共用的工作台 | CU 内部的高速共享存储 |
-| VGPR / SGPR | 每个工人手里的笔记本 | GPU 线程执行时使用的寄存器资源 |
+1. 先理解 AMD GPU 和 ROCm 的基础结构；
+2. 再学习如何设计可信 benchmark；
+3. 然后用 profiling 工具找到瓶颈证据；
+4. 接着用 HIP / Triton 写出优化版本；
+5. 再把问题放到推理链路和编译器视角里看；
+6. 最后把这些步骤整理成 AutoInfra Agent 的自动化闭环。
 
-这些名词一开始看起来多，但它们都服务于同一个问题：一份“菜谱”到底怎样分给很多工人，在 GPU 上铺开执行。
+这也是为什么本教程不会一上来就追求"最快代码"。**先把问题分清楚，再用数据确认方向**——这样换出来的优化才不是一次性的运气，而是下次还能放心复用的方法。
 
-## 3.2 CU、Wavefront、SIMD、LDS、VGPR、SGPR
-
-这一节的名词看起来全是硬件细节，但它们其实只回答一个问题：**为什么有时候开了一万个线程，GPU 反而没变快？** 后面写算子时你会反复撞上这个问题——线程多了，访存乱了，寄存器不够了，这些问题都藏在这些名词背后。现在先认个脸，后面写代码时再回来看，感受会完全不同。
-
-先从 CU 开始。CU，全称 Compute Unit，可以粗略理解为 AMD GPU 上负责执行计算的一组硬件资源。一个 GPU 里会有多个 CU，kernel 启动后，许多 workgroup 会被分派到这些 CU 上执行。
-
-但 GPU 不是让每个线程都完全独立、随心所欲地跑。AMD GPU 里常见的执行单位叫 wavefront。一个 wavefront 是一组一起调度的线程，它们在 SIMD 执行模型下推进。
-
-下面这张表先给出最小解释：
-
-| 名词 | 位置 | 对性能的影响 |
-| ---- | ---- | ---- |
-| CU | GPU 的计算单元 | CU 越忙，GPU 计算资源利用越高 |
-| Wavefront | 一组一起执行的线程 | 分支发散、访存模式会影响 wavefront 效率 |
-| SIMD | 单指令多数据执行方式 | 适合大量线程执行相同操作 |
-| LDS | CU 内部高速共享存储 | 用得好可以减少全局内存访问 |
-| VGPR | 每个线程使用的向量寄存器 | 用太多会降低同时驻留的 wavefront 数量 |
-| SGPR | 存放标量值的寄存器 | 常用于地址、常量、控制信息 |
-
-```mermaid
-flowchart TD
-    A[Kernel Grid] --> B[Workgroup 0]
-    A --> C[Workgroup 1]
-    A --> D[Workgroup N]
-    B --> E[Wavefront]
-    E --> F[Lane 0]
-    E --> G[Lane 1]
-    E --> H[Lane ...]
-    E --> I[Lane N]
-    B --> J[LDS / VGPR / SGPR]
-```
-
-<div align="center">
-  <p>图 3.3 Kernel、Workgroup、Wavefront 和硬件资源的关系</p>
-</div>
-
-如图 3.3 所示，kernel 的并行层级会逐步映射到 GPU 硬件资源上。后续写 HIP kernel 时，你会看到 `blockIdx`、`threadIdx` 这些概念；它们描述的是程序层面的并行组织。到了硬件层，它们会进一步映射到 workgroup、wavefront 和 CU 的执行上。
-
-图 3.4 这张工厂剖面图把上面的层级关系画得更直观一些（如图 3.4 所示）：
-
-![GPU 工厂内部结构](./images/gpu-factory-cu-wavefront.png)
-
-<div align="center">
-  <p>图 3.4 类比示意：GPU 工厂里 CU、Workgroup、Wavefront、Lane 之间的层级</p>
-</div>
-
-这里最容易踩的认知坑是：**线程越多不一定越快**。
-
-如果每个线程都从全局内存乱读乱写，GPU 可能大部分时间都在等数据；如果一个 kernel 用了太多寄存器，同一个 CU 上能同时驻留的 wavefront 变少，延迟隐藏能力也会下降；如果分支太多，同一个 wavefront 里的 lane 不能一起有效工作，SIMD 的优势也会打折。
-
-所以后续做算子优化时，我们不会只问“开了多少线程”，还会问：
-
-- 这些线程访问内存是否连续；
-- 同一个 wavefront 内部是否走相同分支；
-- 有没有把可复用数据放进 LDS；
-- 寄存器使用量是否影响 occupancy；
-- 每个线程的工作量是否太少或太多。
-
-这些问题现在先有印象就够了，后面的 HIP 和 Triton 章节会用具体代码把它们串起来。
-
-<details>
-<summary>案例：连续 vs 非连续访存</summary>
-
-![连续访存 vs 非连续访存](./images/memory-coalescing-vs-strided.png)
-
-<div align="center">
-  <p>图 3.5 连续访存更容易合并，非连续访存会制造更多内存事务</p>
-</div>
-
-![Wavefront 分支发散](./images/wavefront-branch-divergence.png)
-
-<div align="center">
-  <p>图 3.6 同一个 Wavefront 内部分支越整齐，lane 利用率越高</p>
-</div>
-
-</details>
-
-## 3.3 HBM、Cache 与访存层次
-
-很多 AI 算子看起来是在”算”，但真正的瓶颈经常是”搬数据”。这一节我们就来拆开 GPU 的存储系统，看看数据在搬动过程中会遇到什么。
-
-矩阵乘之所以值得花大力气优化，不只是因为乘加计算多，更因为数据能不能被重复利用决定了最终效率；Softmax 之所以容易受访存拖累，是因为它要读输入、做归约、写输出，每一步都在和数据搬运打交道；Attention 之所以复杂，是因为它同时牵涉矩阵乘、Softmax、Mask、KV Cache 和内存布局——搬数据的路径比计算本身更难理顺。
-
-你可以先把 GPU 的访存层次画成一座金字塔（如图 3.7 所示）：
-
-![GPU 访存层次金字塔](./images/memory-hierarchy-pyramid.png)
-
-<div align="center">
-  <p>图 3.7 GPU 访存层次的金字塔视图</p>
-</div>
-
-如图 3.7 所示，越靠上通常越快、容量越小；越靠下容量越大，但访问代价更高。
-
-在数据中心 GPU 上，显存通常是 HBM。在 AI MAX 395 这类 APU 上，GPU 使用的是面向整机的内存资源，工具里仍然可能以“显存占用”的形式展示。无论底层形态是什么，对性能分析最重要的仍然是三件事：带宽、局部性、复用。
-
-| 关注点 | 问题 | 例子 |
-| ---- | ---- | ---- |
-| 带宽 | 单位时间能搬多少数据 | 大向量逐元素读写容易受带宽影响 |
-| 局部性 | 数据访问是否集中、连续 | 连续线程访问连续地址通常更友好 |
-| 复用 | 同一份数据能否多次使用 | Matmul 会尽量复用 tile 里的数据 |
-
-后面你会经常看到两个词：memory-bound（被搬数据卡住）和 compute-bound（被算数卡住）。这是判断一个算子瓶颈的最基本分类。
-
-- memory-bound：主要时间花在等数据，优化方向通常是减少访存、改善访问模式、提高复用；
-- compute-bound：主要时间花在计算，优化方向通常是提高并行度、使用更合适的数据类型或指令路径。
-
-判断一个 kernel 属于哪类，不能靠猜。第 2 篇会用 benchmark、profiling 和硬件计数器来收集证据。
-
-## 3.4 ROCm 是什么
-
-前面三节我们都站在 GPU 硬件视角看东西：CU 怎么调度、wavefront 怎么并行、数据怎么从显存搬上来。现在把镜头往上拉一层——你写的 PyTorch / HIP 代码，到底是怎么一路递到 GPU 上的？答案就藏在 ROCm 这套软件栈里。
-
-ROCm（Radeon Open Compute）可以理解为 AMD GPU 的开放软件栈。它负责把上层框架、编译器、运行时、库和驱动连接起来，让程序能在 AMD GPU 上运行。它不是单个命令，也不是单个库——它是一整套分层组件。
-
-```mermaid
-flowchart TD
-    A[应用 / 模型服务] --> B[PyTorch / ONNX Runtime / vLLM]
-    B --> C[Triton / MIGraphX / TorchInductor]
-    B --> D[rocBLAS / MIOpen / RCCL 等库]
-    C --> E[HIP / 编译器工具链]
-    D --> E
-    E --> F[HSA Runtime]
-    F --> G[AMDGPU Driver]
-    G --> H[AMD GPU 硬件]
-```
-
-<div align="center">
-  <p>图 3.8 ROCm 软件栈把上层框架连接到 AMD GPU 硬件</p>
-</div>
-
-如图 3.8 所示，ROCm 不是单个命令，也不是单个库。它是一整套分层组件。
-
-目前你只需要知道：PyTorch 在最上面，马上就会用到；HIP 和 `hipcc` 在中间，[第 4 章](../chapter3/index.md)就会用到；HSA Runtime 和 AMDGPU Driver 在最下面，平时一般不直接写，但排错时会听到它们的名字。其他名字先认个位置，遇到再回来查。
-
-| 层次 | 作用 | 你会在哪里接触 |
-| ---- | ---- | ---- |
-| 上层框架 | 表达模型和张量计算 | PyTorch、ONNX Runtime、vLLM |
-| 编译器 / 图优化 | 改写图、生成或选择 kernel | Triton、MIGraphX、TorchInductor |
-| 算子库 | 提供常见高性能算子 | rocBLAS、MIOpen、hipBLAS |
-| HIP 工具链 | 编写和编译 GPU 程序 | `hipcc`、HIP Runtime |
-| HSA Runtime | 管理 GPU 队列、内存和调度接口 | 通常不直接写，但 profiling 时会看到 |
-| Driver | 和内核、硬件交互 | 环境排错时会接触 |
-| GPU 硬件 | 真正执行 kernel | CU、Wavefront、LDS、寄存器、内存层次 |
-
-平时写教程实验时，你最常直接接触的是 PyTorch、Triton、HIP、rocprof、rocm-smi 这些工具。它们背后都在调用 ROCm 栈里的不同组件。
-
-## 3.5 HIP、HSA、AMDGPU Driver 的关系
-
-前面看了 ROCm 的分层全貌，这一节聚焦其中最容易被混淆的三个名字，把一条 HIP 程序从 Host 端提交到 GPU 执行的完整路径拆开。
-
-HIP、HSA、AMDGPU Driver 这几个词很容易混在一起，可以先这样区分：
-
-- HIP 是给程序员用的 GPU 编程接口；
-- HSA Runtime 是更底层的运行时接口；
-- AMDGPU Driver 是操作系统里负责和 GPU 硬件交互的驱动。
-
-当你编译并运行一个 HIP 程序时，大致路径如下。先用白话翻译一下：你的 C++ 代码说“在 GPU 上分配点显存、拷点数据、启动一个并行函数”，这条命令要经过 HIP、HSA、驱动、硬件几道转手，才真正落到 GPU 上。
-
-```mermaid
-sequenceDiagram
-    participant Host as CPU Host 程序
-    participant HIP as HIP Runtime
-    participant HSA as HSA Runtime
-    participant Driver as AMDGPU Driver
-    participant GPU as AMD GPU
-
-    Host->>HIP: hipMalloc / hipMemcpy / kernel launch
-    HIP->>HSA: 创建队列并提交任务
-    HSA->>Driver: 通过驱动与 GPU 交互
-    Driver->>GPU: 调度 kernel 执行
-    GPU-->>Driver: 执行完成
-    Driver-->>HSA: 返回状态
-    HSA-->>HIP: 同步结果
-    HIP-->>Host: 程序继续执行
-```
-
-<div align="center">
-  <p>图 3.9 HIP 程序从 Host 侧提交到 AMD GPU 执行的简化路径</p>
-</div>
-
-如图 3.9 所示，HIP 是你写代码时看到的接口，但它不是最底层。它会继续通过 runtime 和 driver 把任务提交给硬件。换成更直观的画面，可以把这条链路想成一个 4 棒接力赛（如图 3.10 所示）：
-
-![HIP 调用接力赛](./images/hip-relay-race.png)
-
-<div align="center">
-  <p>图 3.10 类比示意：HIP 程序的 Host→HIP→HSA→Driver→GPU 接力链路</p>
-</div>
-
-这也解释了为什么排错时要分层：
-
-| 失败位置 | 可能看到的现象 |
-| ---- | ---- |
-| Driver / 设备识别 | `rocminfo` 看不到 GPU |
-| ROCm Runtime | 框架无法初始化 GPU 后端 |
-| HIP 编译器 / device library | `hipcc` 编译失败 |
-| 框架依赖 | `import torch` 成功但 `torch.cuda.is_available()` 为 False |
-| 程序逻辑 | kernel 能运行但结果错误 |
-
-[第 1 章 1.3 节](../../part0-preface/chapter2/index.md#_1-3-验证-gpu-可见性)的环境验证之所以从 `rocminfo`、`rocm-smi` 开始，再到 PyTorch 和 HIP，就是为了从底层到上层逐层确认。
-
-## 3.6 PyTorch / Triton / MIGraphX / vLLM 与 ROCm 的关系
-
-理解了 ROCm 是什么，后续你会接触很多站在它之上的工具。它们并不是 ROCm 的替代品，而是利用 ROCm 提供的能力，从不同角度使用 GPU。
-
-| 工具 | 主要定位 | 和 ROCm 的关系 |
-| ---- | ---- | ---- |
-| PyTorch ROCm | 深度学习框架 | 通过 ROCm 后端把张量计算放到 AMD GPU 上 |
-| Triton on AMD | 高层 GPU kernel 编程和自动调优 | 生成面向 AMD GPU 的 kernel，需要 ROCm 编译和运行能力 |
-| MIGraphX | AMD 的图优化和推理编译工具 | 把模型图优化后落到 ROCm / AMD GPU 执行 |
-| ONNX Runtime ROCm | ONNX 推理运行时 | 通过 ROCm Execution Provider 使用 AMD GPU |
-| vLLM on AMD | LLM 推理服务框架 | 依赖 PyTorch / ROCm / kernel 支持，具体能力和版本强相关 |
-
-可以把 ROCm 想成地基。PyTorch、Triton、MIGraphX、vLLM 是建在地基上的不同房间。房间用途不同，但地基不稳，哪个房间都住不舒服。
-
-这也是为什么[第 1 章 1.3 节](../../part0-preface/chapter2/index.md#_1-3-验证-gpu-可见性)先验证底层环境，而本章再解释软件栈。等你后面遇到 PyTorch、Triton 或推理引擎报错时，可以先判断：这是上层工具自己的问题，还是 ROCm 底层链路没通。
-
-## 3.7 如何检查一台机器的 AMD GPU 环境
-
-[第 1 章 1.3 节](../../part0-preface/chapter2/index.md#_1-3-验证-gpu-可见性)已经带你跑过一组检查命令。本节不重复贴输出，而是把这些命令放回软件栈的语境里——让每个"验证动作"和 ROCm 的某一层对上号。这样以后排错时，你不再是盲目地反复敲命令，而是知道自己正在敲打哪一层。
-
-| 命令 | 它在敲打什么 | 如果失败，先怀疑哪里 |
-| ---- | ---- | ---- |
-| `rocminfo` | 敲打 GPU 本身，问“你叫什么名字、是什么架构” | 设备识别、驱动或 ROCm runtime |
-| `rocm-smi` | 敲打 GPU 本身，问“你现在状态怎样” | 设备状态、显存占用、功耗或权限问题 |
-| `python -c "import torch"` | 敲打 Python 环境，问“框架包装好了没” | Python 依赖或当前虚拟环境 |
-| `torch.cuda.is_available()` | 敲打 PyTorch，问“你有没有连上 GPU” | PyTorch ROCm 后端或 runtime 初始化 |
-| `hipcc --version` | 敲打 HIP 编译器，问“你是不是当前环境里的工具链” | `ROCM_PATH`、`HIP_PATH` 或 uv 环境激活 |
-| `hipcc xxx.hip` | 敲打编译链路，问“源文件能不能变成 GPU 程序” | 编译器、device library 或代码语法 |
-
-排错时建议从下往上看：
-
-```mermaid
-flowchart TD
-    A[GPU 是否被系统识别] --> B[ROCm Runtime 是否可用]
-    B --> C[Python 环境是否正确]
-    C --> D[PyTorch ROCm 是否可用]
-    D --> E[HIP 编译链路是否可用]
-    E --> F[具体程序逻辑是否正确]
-```
-
-<div align="center">
-  <p>图 3.11 AMD GPU 环境排错的推荐顺序</p>
-</div>
-
-如图 3.11 所示，越底层的问题越应该优先排查。比如 `rocminfo` 都看不到 GPU，就没必要先研究 PyTorch；`ROCM_PATH` 没指到正确位置，也没必要先怀疑你的 HIP kernel 写错了。
-
-这套顺序后面还会继续用。只不过到 profiling、推理服务和编译器章节时，我们会在每一层加入更多证据，而不是只看“能不能跑”。
-
-小练习：在你自己的环境里跑一遍上面这 6 个命令，把每条命令的关键输出抄进一份临时的 `notes.md`。然后做一个小实验：故意先 `unset ROCM_PATH` 再激活环境，预测一下哪几条会先挂、报什么错。跑一次看看猜得对不对。这个小动作能帮你把"软件栈分层"这个抽象概念，和你机器上的真实输出绑在一起。
-
-到这里，AMD GPU 这块地基我们已经从硬件结构、访存层次、ROCm 软件栈、HIP 提交链路一路看到了环境检查。下一章，终于要真正写一段代码，把这套地基用起来了。
+到这里，AI Infra 的地图已经在你手上了。下一章，我们把镜头从整条链路收回来，对准地图最底层的那块地基——AMD GPU 和 ROCm 软件栈本身。
 
 ## 本章小结
 
-- AMD GPU 适合大量结构相似的并行计算，CPU 侧通常负责调度，GPU 侧负责执行 kernel。
-- CU、Wavefront、LDS、VGPR、SGPR 是理解 AMD GPU 执行模型时最常见的基础词。
-- 性能问题经常和访存层次有关，不能只看“算了多少”，还要看“搬了多少、怎么搬”。
-- ROCm 是 AMD GPU 的软件栈，连接上层框架、编译器、算子库、runtime、driver 和硬件。
-- HIP 是常用编程接口，HSA Runtime 和 AMDGPU Driver 位于更底层。
-- 检查 AMD GPU 环境时，应该从设备识别、runtime、框架、编译器到具体程序逐层排查。
+- 一次模型请求会穿过服务层、框架层、算子层、runtime、驱动和硬件层——每一层都可能成为瓶颈。
+- AI Infra 优化的第一步不是改 kernel，而是判断问题落在哪一层。
+- 算子优化盯单个 kernel、推理优化盯端到端链路、编译器优化盯图和程序变换——三者边界不同，不能混在一起看。
+- AI Infra 工程师需要同时具备硬件理解、测量分析、工程实现和复现表达四类能力。
+- 拿到性能问题时，先按分诊路径判断它更像服务、框架、算子、运行时还是硬件问题。
+- 本教程后续会围绕 HPOA 闭环展开：理解硬件 → 收集证据 → 提出优化 → 自动化复盘。
+
+## 自检问题
+
+读完本章后，你应该能回答：
+
+1. 为什么"GPU 利用率低"不是一个完整结论？背后至少有哪几种可能？
+2. 算子优化、推理优化、编译器优化分别盯住哪一层？给一个属于各自范畴的具体例子。
+3. benchmark 为什么需要 warmup、repeat 和 synchronize？少了任意一个会怎样？
+4. 如果一次推理很慢，你会先问哪几个问题，而不是直接改 kernel？
+
+如果有一题答不上来，回到对应小节再读一遍即可——这些问题就是后面所有篇章的"前置条件"。
 
 ## 延伸阅读
 
-- [ROCm Documentation](https://rocm.docs.amd.com/)
-- [HIP Documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/)
-- [ROCm System Management Interface](https://rocm.docs.amd.com/projects/rocm_smi_lib/en/latest/)
+- [AMD ROCm Documentation](https://rocm.docs.amd.com/)
+- [PyTorch Profiler](https://pytorch.org/tutorials/recipes/recipes/profiler_recipe.html)
+- [Triton Language Documentation](https://triton-lang.org/main/index.html)

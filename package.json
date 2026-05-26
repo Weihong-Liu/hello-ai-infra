@@ -9,6 +9,9 @@
     "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
+    "markdown-it-container": "^4.0.0",
+    "markdown-it-footnote": "^4.0.0",
+    "markdown-it-mathjax3": "^4.3.2",
     "mermaid": "^11.14.0",
     "vitepress": "^2.0.0-alpha.16",
     "vue": "^3.5.0"

@@ -1,0 +1,10 @@
+"Correlation_Id","Dispatch_Id","Agent_Id","Queue_Id","Process_Id","Thread_Id","Grid_Size","Kernel_Id","Kernel_Name","Workgroup_Size","LDS_Block_Size","Scratch_Size","VGPR_Count","Accum_VGPR_Count","SGPR_Count","Counter_Name","Counter_Value","Start_Timestamp","End_Timestamp"
+1,1,"Agent 1",1,998734,998734,1024,13,"__amd_rocclr_copyBuffer",512,0,0,16,0,128,"L2CacheHit",32.994924,6125236932751582,6125236932756752
+2,2,"Agent 1",1,998734,998734,1024,13,"__amd_rocclr_copyBuffer",512,0,0,16,0,128,"L2CacheHit",33.505155,6125236932850007,6125236932852732
+3,3,"Agent 1",1,998734,998734,4194304,18,"layernorm_v1_fused(float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"L2CacheHit",38.393903,6125236933369041,6125236934262734
+4,4,"Agent 1",1,998734,998734,4194304,18,"layernorm_v1_fused(float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"L2CacheHit",37.997793,6125236934287421,6125236935068140
+5,5,"Agent 1",1,998734,998734,4194304,18,"layernorm_v1_fused(float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"L2CacheHit",37.664901,6125236935113776,6125236935888003
+6,6,"Agent 1",1,998734,998734,4194304,18,"layernorm_v1_fused(float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"L2CacheHit",37.624625,6125236935913171,6125236936693930
+7,7,"Agent 1",1,998734,998734,4194304,18,"layernorm_v1_fused(float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"L2CacheHit",37.788227,6125236936719859,6125236937492283
+8,8,"Agent 1",1,998734,998734,4194304,18,"layernorm_v1_fused(float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"L2CacheHit",36.967299,6125236937532158,6125236938327104
+9,9,"Agent 1",1,998734,998734,4194304,18,"layernorm_v1_fused(float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"L2CacheHit",37.361370,6125236938351110,6125236939124575

@@ -98,6 +98,55 @@
 }
 
 /* ============================================================================
+   Figures (::: figure fig-id ... :::)
+   ============================================================================ */
+.vp-doc .figure {
+  margin: 24px auto;
+  text-align: center;
+}
+
+.vp-doc .figure > p {
+  text-align: center;
+}
+
+.vp-doc .figure img {
+  margin: 0 auto;
+}
+
+.vp-doc #fig-amd-gpu-timeline img {
+  width: min(100%, 960px);
+  max-height: none;
+}
+
+.vp-doc #fig-amd-gpu-timeline .theme-dark-only {
+  display: none;
+}
+
+.dark .vp-doc #fig-amd-gpu-timeline .theme-light-only {
+  display: none;
+}
+
+.dark .vp-doc #fig-amd-gpu-timeline .theme-dark-only {
+  display: block;
+}
+
+.vp-doc .figure-caption {
+  text-align: center;
+  color: var(--vp-c-text-2);
+  font-size: 0.9em;
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+.vp-doc .figure-ref {
+  text-decoration: none;
+}
+
+.vp-doc .figure-ref:hover {
+  text-decoration: underline;
+}
+
+/* ============================================================================
    Mermaid Diagrams
    ============================================================================ */
 .mermaid-block {

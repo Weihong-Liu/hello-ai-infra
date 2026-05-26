@@ -1,0 +1,24 @@
+"Correlation_Id","Dispatch_Id","Agent_Id","Queue_Id","Process_Id","Thread_Id","Grid_Size","Kernel_Id","Kernel_Name","Workgroup_Size","LDS_Block_Size","Scratch_Size","VGPR_Count","Accum_VGPR_Count","SGPR_Count","Counter_Name","Counter_Value","Start_Timestamp","End_Timestamp"
+1,1,"Agent 1",1,998702,998702,1024,3,"__amd_rocclr_copyBuffer",512,0,0,16,0,128,"LDSBankConflict",0.00000000e+00,6125235405823559,6125235405828448
+2,2,"Agent 1",1,998702,998702,1024,3,"__amd_rocclr_copyBuffer",512,0,0,16,0,128,"LDSBankConflict",0.00000000e+00,6125235405877159,6125235405879724
+3,3,"Agent 1",1,998702,998702,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"LDSBankConflict",0.00000000e+00,6125235406432578,6125235406846761
+4,4,"Agent 1",1,998702,998702,4194304,18,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"LDSBankConflict",0.00000000e+00,6125235406871046,6125235407219545
+5,5,"Agent 1",1,998702,998702,4194304,16,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"LDSBankConflict",0.00000000e+00,6125235407243350,6125235407771988
+6,6,"Agent 1",1,998702,998702,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"LDSBankConflict",0.00000000e+00,6125235407799440,6125235408202802
+7,7,"Agent 1",1,998702,998702,4194304,18,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"LDSBankConflict",0.00000000e+00,6125235408226046,6125235408573542
+8,8,"Agent 1",1,998702,998702,4194304,16,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"LDSBankConflict",0.00000000e+00,6125235408598589,6125235409125264
+9,9,"Agent 1",1,998702,998702,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"LDSBankConflict",0.00000000e+00,6125235409172363,6125235409580053
+10,10,"Agent 1",1,998702,998702,4194304,18,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"LDSBankConflict",0.00000000e+00,6125235409604259,6125235409952477
+11,11,"Agent 1",1,998702,998702,4194304,16,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"LDSBankConflict",0.00000000e+00,6125235409978205,6125235410503157
+12,12,"Agent 1",1,998702,998702,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"LDSBankConflict",0.00000000e+00,6125235410531611,6125235410936736
+13,13,"Agent 1",1,998702,998702,4194304,18,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"LDSBankConflict",0.00000000e+00,6125235410960581,6125235411308799
+14,14,"Agent 1",1,998702,998702,4194304,16,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"LDSBankConflict",0.00000000e+00,6125235411334006,6125235411859078
+15,15,"Agent 1",1,998702,998702,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"LDSBankConflict",0.00000000e+00,6125235411887772,6125235412293979
+16,16,"Agent 1",1,998702,998702,4194304,18,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"LDSBankConflict",0.00000000e+00,6125235412318466,6125235412662515
+17,17,"Agent 1",1,998702,998702,4194304,16,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"LDSBankConflict",0.00000000e+00,6125235412688485,6125235413214879
+18,18,"Agent 1",1,998702,998702,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"LDSBankConflict",0.00000000e+00,6125235413243613,6125235413647817
+19,19,"Agent 1",1,998702,998702,4194304,18,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"LDSBankConflict",0.00000000e+00,6125235413673425,6125235414019639
+20,20,"Agent 1",1,998702,998702,4194304,16,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"LDSBankConflict",0.00000000e+00,6125235414045047,6125235414571561
+21,21,"Agent 1",1,998702,998702,4194304,20,"ln_v0_mean(float const*, float*, int)",1024,0,0,8,0,128,"LDSBankConflict",0.00000000e+00,6125235414601859,6125235415006663
+22,22,"Agent 1",1,998702,998702,4194304,18,"ln_v0_var(float const*, float const*, float*, int)",1024,0,0,8,0,128,"LDSBankConflict",0.00000000e+00,6125235415031831,6125235415381732
+23,23,"Agent 1",1,998702,998702,4194304,16,"ln_v0_norm(float const*, float const*, float const*, float const*, float const*, float*, int, float)",1024,0,0,16,0,128,"LDSBankConflict",0.00000000e+00,6125235415406779,6125235415933213

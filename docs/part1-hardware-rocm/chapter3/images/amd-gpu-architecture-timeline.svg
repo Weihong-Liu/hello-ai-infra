@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1680" role="img" aria-labelledby="title desc">
+  <title id="title">AMD GPU 主要架构演进时间线</title>
+  <desc id="desc">从 2007 年 TeraScale 到 2025 年 RDNA 4 与 CDNA 4 的 AMD GPU 架构演进时间线，展示 2020 年后 RDNA 与 CDNA 两条路线的分叉。</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .panel { fill: #ffffff; stroke: #d9dee7; stroke-width: 1.5; }
+      .panel-muted { fill: #f1f5f9; stroke: #d9dee7; stroke-width: 1.5; }
+      .title { font: 700 40px -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #111827; }
+      .subtitle { font: 500 18px -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #64748b; }
+      .year { font: 800 30px -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #111827; }
+      .name { font: 700 24px -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #111827; }
+      .copy { font: 500 17px -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #475569; }
+      .label { font: 800 17px -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif; letter-spacing: .08em; }
+      .spine { stroke: #94a3b8; stroke-width: 5; stroke-linecap: round; }
+      .branch { fill: none; stroke: #94a3b8; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+      .dot { fill: #ffffff; stroke: #ef4444; stroke-width: 5; }
+      .dot-rdna { fill: #ffffff; stroke: #f97316; stroke-width: 5; }
+      .dot-cdna { fill: #ffffff; stroke: #2563eb; stroke-width: 5; }
+      .rdna { fill: #fff7ed; stroke: #fed7aa; stroke-width: 1.5; }
+      .cdna { fill: #eff6ff; stroke: #bfdbfe; stroke-width: 1.5; }
+      .base { fill: #fff1f2; stroke: #fda4af; stroke-width: 2; }
+      .rdna-text { fill: #c2410c; }
+      .cdna-text { fill: #1d4ed8; }
+      .base-text { fill: #be123c; }
+      .small { font-size: 16px; }
+    </style>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect class="bg" width="1200" height="1680" rx="32"/>
+
+  <text class="title" x="80" y="82">AMD GPU 主要架构演进时间线</text>
+  <text class="subtitle" x="80" y="118">从统一图形架构，到 RDNA / CDNA 双路线；AI MAX 395 位于 RDNA 3.5 / gfx1151。</text>
+
+  <line class="spine" x1="600" y1="178" x2="600" y2="858"/>
+
+  <g filter="url(#shadow)">
+    <rect class="panel" x="135" y="158" width="390" height="118" rx="22"/>
+    <circle class="dot" cx="600" cy="217" r="14"/>
+    <line class="branch" x1="525" y1="217" x2="586" y2="217"/>
+    <text class="year" x="165" y="207">2007</text>
+    <text class="name" x="255" y="207">TeraScale (R600)</text>
+    <text class="copy" x="165" y="240">偏图形渲染，通用计算还不是主线。</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect class="panel" x="675" y="293" width="390" height="142" rx="22"/>
+    <circle class="dot" cx="600" cy="364" r="14"/>
+    <line class="branch" x1="614" y1="364" x2="675" y2="364"/>
+    <text class="year" x="705" y="344">2012</text>
+    <text class="name" x="795" y="344">GCN 1.0</text>
+    <text class="copy" x="705" y="378">转向通用计算；引入 CU / wave64 /</text>
+    <text class="copy" x="705" y="403">SIMD / LDS / VGPR / SGPR。</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect class="panel" x="135" y="452" width="390" height="118" rx="22"/>
+    <circle class="dot" cx="600" cy="511" r="14"/>
+    <line class="branch" x1="525" y1="511" x2="586" y2="511"/>
+    <text class="year" x="165" y="501">2016</text>
+    <text class="name" x="255" y="501">Polaris</text>
+    <text class="copy" x="165" y="534">GCN 4，RX 400 / 500 消费级主流。</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect class="panel" x="675" y="587" width="390" height="118" rx="22"/>
+    <circle class="dot" cx="600" cy="646" r="14"/>
+    <line class="branch" x1="614" y1="646" x2="675" y2="646"/>
+    <text class="year" x="705" y="636">2018</text>
+    <text class="name" x="795" y="636">Vega</text>
+    <text class="copy" x="705" y="662">GCN 5，Radeon VII / MI50 / MI60；</text>
+    <text class="copy" x="705" y="686">引入 HBM。</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect class="panel" x="135" y="722" width="390" height="118" rx="22"/>
+    <circle class="dot" cx="600" cy="781" r="14"/>
+    <line class="branch" x1="525" y1="781" x2="586" y2="781"/>
+    <text class="year" x="165" y="771">2019</text>
+    <text class="name" x="255" y="771">RDNA 1</text>
+    <text class="copy" x="165" y="804">RX 5000，wave32 + 游戏效率。</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect class="panel-muted" x="360" y="858" width="480" height="150" rx="28"/>
+    <circle class="dot" cx="600" cy="858" r="14"/>
+    <text class="year" x="435" y="928">2020</text>
+    <text class="name" x="535" y="928">RDNA / CDNA 分叉</text>
+    <text class="copy" x="435" y="962">图形 / APU 与数据中心 / HPC / AI</text>
+    <text class="copy" x="435" y="986">从这里开始走两条路线。</text>
+  </g>
+
+  <path class="branch" d="M600 1008 C600 1048 330 1048 330 1090 L330 1540"/>
+  <path class="branch" d="M600 1008 C600 1048 870 1048 870 1090 L870 1540"/>
+
+  <text class="label rdna-text" x="237" y="1078">RDNA 线 · 图形 / 消费 / APU</text>
+  <text class="label cdna-text" x="758" y="1078">CDNA 线 · 数据中心 / HPC / AI</text>
+
+  <g filter="url(#shadow)">
+    <rect class="rdna" x="105" y="1110" width="450" height="112" rx="22"/>
+    <circle class="dot-rdna" cx="330" cy="1110" r="13"/>
+    <text class="year" x="135" y="1160">2020</text>
+    <text class="name" x="225" y="1160">RDNA 2</text>
+    <text class="copy" x="135" y="1188">RX 6000，硬件光追</text>
+    <text class="copy" x="135" y="1212">+ Infinity Cache，覆盖 PS5 / Xbox。</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect class="cdna" x="645" y="1110" width="450" height="112" rx="22"/>
+    <circle class="dot-cdna" cx="870" cy="1110" r="13"/>
+    <text class="year" x="675" y="1160">2020</text>
+    <text class="name" x="765" y="1160">CDNA 1</text>
+    <text class="copy" x="675" y="1193">MI100，面向数据中心的计算路线。</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect class="cdna" x="645" y="1248" width="450" height="112" rx="22"/>
+    <circle class="dot-cdna" cx="870" cy="1248" r="13"/>
+    <text class="year" x="675" y="1298">2021</text>
+    <text class="name" x="765" y="1298">CDNA 2</text>
+    <text class="copy" x="675" y="1324">MI250X，HBM2e + xGMI</text>
+    <text class="copy" x="675" y="1348">多 GPU 互联。</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect class="rdna" x="105" y="1248" width="450" height="112" rx="22"/>
+    <circle class="dot-rdna" cx="330" cy="1248" r="13"/>
+    <text class="year" x="135" y="1298">2022</text>
+    <text class="name" x="225" y="1298">RDNA 3</text>
+    <text class="copy" x="135" y="1324">RX 7000，chiplet</text>
+    <text class="copy" x="135" y="1348">(GCD + MCD) + WMMA AI 加速。</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect class="cdna" x="645" y="1386" width="450" height="112" rx="22"/>
+    <circle class="dot-cdna" cx="870" cy="1386" r="13"/>
+    <text class="year" x="675" y="1436">2023</text>
+    <text class="name" x="765" y="1436">CDNA 3</text>
+    <text class="copy" x="675" y="1462">MI300，chiplet + HBM3</text>
+    <text class="copy" x="675" y="1486">+ APU (MI300A)。</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect class="base" x="105" y="1386" width="450" height="130" rx="22"/>
+    <circle class="dot-rdna" cx="330" cy="1386" r="13"/>
+    <text class="year" x="135" y="1436">2024</text>
+    <text class="name" x="225" y="1436">RDNA 3.5 / gfx1151</text>
+    <text class="copy" x="135" y="1462">Strix Halo APU；</text>
+    <text class="copy" x="135" y="1486">本书硬件基线</text>
+    <text class="copy base-text" x="135" y="1510">AI MAX 395</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect class="rdna" x="105" y="1540" width="450" height="96" rx="22"/>
+    <circle class="dot-rdna" cx="330" cy="1540" r="13"/>
+    <text class="year" x="135" y="1591">2025</text>
+    <text class="name" x="225" y="1591">RDNA 4</text>
+    <text class="copy" x="135" y="1622">RX 9000，第二代光追。</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect class="cdna" x="645" y="1540" width="450" height="96" rx="22"/>
+    <circle class="dot-cdna" cx="870" cy="1540" r="13"/>
+    <text class="year" x="675" y="1591">2025</text>
+    <text class="name" x="765" y="1591">CDNA 4</text>
+    <text class="copy" x="675" y="1622">MI350，AI 路线继续演进。</text>
+  </g>
+</svg>

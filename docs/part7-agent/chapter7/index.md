@@ -1,6 +1,6 @@
 ---
 title: "第35章 最小 AutoInfra Agent 系统"
-description: "Hello AI Infra 第35章 · 把硬件采集、benchmark、profiling、计划、执行和报告串成闭环"
+description: "Hello GPU 第35章 · 把硬件采集、benchmark、profiling、计划、执行和报告串成闭环"
 ---
 
 # 第35章 最小 AutoInfra Agent 系统

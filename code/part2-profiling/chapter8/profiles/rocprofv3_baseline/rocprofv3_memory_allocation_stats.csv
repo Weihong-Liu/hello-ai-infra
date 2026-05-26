@@ -1,0 +1,2 @@
+"Name","Calls","TotalDurationNs","AverageNs","Percentage","MinNs","MaxNs","StdDev"
+"MEMORY_ALLOCATION_ALLOCATE",9,18166870,2018541.111111,100.00,13234,4929664,1712863.066405

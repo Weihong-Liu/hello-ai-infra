@@ -1,6 +1,6 @@
 ---
 title: "第29章 为什么 AI Infra 需要 Agent"
-description: "Hello AI Infra 第29章 · 人类优化流程、可自动化环节、LLM 角色、AutoInfra 总架构"
+description: "Hello GPU 第29章 · 人类优化流程、可自动化环节、LLM 角色、AutoInfra 总架构"
 ---
 
 # 第29章 为什么 AI Infra 需要 Agent
