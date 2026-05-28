@@ -3,6 +3,7 @@ import './custom.css'
 import type { Theme } from 'vitepress'
 import { h } from 'vue'
 import MermaidDiagram from './MermaidDiagram.vue'
+import SidebarToggle from './SidebarToggle.vue'
 
 const Announcement = () => h('div', {
   class: 'announcement-banner',
@@ -15,7 +16,7 @@ export default {
   },
   Layout() {
     return h(DefaultTheme.Layout, null, {
-      'layout-top': () => h(Announcement)
+      'layout-top': () => [h(Announcement), h(SidebarToggle)],
     })
   }
 } satisfies Theme
