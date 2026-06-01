@@ -1,4 +1,4 @@
-export const repoBaseUrl = 'https://github.com/Weihong-Liu/hello-ai-infra/blob/main'
+export const repoBaseUrl = 'https://github.com/datawhalechina/hello-gpu/blob/main'
 
 export const parts = [
   {
@@ -534,7 +534,7 @@ export const navItems = [
   { text: '全书目录', link: '/part0-preface/chapter0/' },
   { text: '学习路线', link: '/part0-preface/chapter0/#_0-6-学习路线图' },
   { text: '实验环境', link: '/part0-preface/chapter1/' },
-  { text: 'GitHub', link: 'https://github.com/Weihong-Liu/hello-ai-infra' },
+  { text: 'GitHub', link: 'https://github.com/datawhalechina/hello-gpu' },
 ]
 
 export const sidebar = parts.map((part) => ({

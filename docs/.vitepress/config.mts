@@ -9,7 +9,7 @@ function encodeMermaid(value: string) {
 }
 
 const isEdgeOne = process.env.EDGEONE === '1'
-const baseConfig = isEdgeOne ? '/' : '/hello-ai-infra/'
+const baseConfig = isEdgeOne ? '/' : '/hello-gpu/'
 
 export default defineConfig({
   lang: 'zh-CN',
@@ -107,11 +107,11 @@ export default defineConfig({
     sidebar,
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/Weihong-Liu/hello-ai-infra' },
+      { icon: 'github', link: 'https://github.com/datawhalechina/hello-gpu' },
     ],
 
     editLink: {
-      pattern: 'https://github.com/Weihong-Liu/hello-ai-infra/blob/main/docs/:path',
+      pattern: 'https://github.com/datawhalechina/hello-gpu/blob/main/docs/:path',
       text: '在 GitHub 上编辑此页',
     },
 
