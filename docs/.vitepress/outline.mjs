@@ -321,8 +321,32 @@ export function numberedChapters() {
   )
 }
 
+// 附录：独立成篇，不进 numberedChapters 的连续正文编号。
+// 附录编号用 appendix-A / appendix-B 这样的形式，避免和正文章号冲突。
+export const appendices = [
+  {
+    title: '附录 A · 环境安装细节与常见坑',
+    summary: '本篇环境文件是怎么来的、为什么 AMD wheel 源要 explicit、rocm-sdk init 的坑',
+    lead: '主线内容只要求你会跑 uv sync 和几个验证命令。但很多读者还会想知道——这套环境文件到底是怎么来的？本附录从这个问题出发，按步骤拆开本篇环境的生成过程，顺便把几个反复出现的坑提前指出来。',
+    slug: 'appendix-a',
+    dir: 'appendix-a-env-install',
+    path: '/appendix/appendix-a-env-install/',
+    source: 'docs/appendix/appendix-a-env-install/index.md',
+  },
+  {
+    title: '附录 B · 换一张卡：从 gfx120X-all 迁移到 gfx1151',
+    summary: 'AMD wheel 源按架构分开打包，换卡时需要改哪些地方、为什么这么改',
+    lead: '本教程的实验基线是 gfx120X-all（RX 9070 XT / gfx1201）+ ROCm 7.13.0。但如果你手上的是其它架构（比如 RDNA 3.5 的 gfx1151 / AI MAX 395），照着本教程的 pyproject.toml 抄下来，uv sync 很可能直接报错。本附录只回答一个问题：换一张卡，环境文件到底要动哪几行？',
+    slug: 'appendix-b',
+    dir: 'appendix-b-switch-gpu',
+    path: '/appendix/appendix-b-switch-gpu/',
+    source: 'docs/appendix/appendix-b-switch-gpu/index.md',
+  },
+]
+
 export const chapters = numberedChapters()
 export const chapterCount = chapters.length
+export const appendixCount = appendices.length
 export const bodyPartCount = parts.length - 1
 
 export const navItems = [
@@ -332,13 +356,27 @@ export const navItems = [
   { text: 'GitHub', link: 'https://github.com/datawhalechina/hello-gpu' },
 ]
 
-export const sidebar = parts.map((part) => ({
-  text: part.readmeTitle,
-  collapsed: false,
-  items: chapters
-    .filter((chapter) => chapter.part.prefix === part.prefix)
-    .map((chapter) => ({
-      text: `第 ${chapter.number} 章 ${chapter.title}`,
-      link: chapter.path,
-    })),
-}))
+export const sidebar = [
+  ...parts.map((part) => ({
+    text: part.readmeTitle,
+    collapsed: false,
+    items: chapters
+      .filter((chapter) => chapter.part.prefix === part.prefix)
+      .map((chapter) => ({
+        text: `第 ${chapter.number} 章 ${chapter.title}`,
+        link: chapter.path,
+      })),
+  })),
+  ...(appendixCount > 0
+    ? [
+        {
+          text: '附录',
+          collapsed: false,
+          items: appendices.map((a) => ({
+            text: a.title,
+            link: a.path,
+          })),
+        },
+      ]
+    : []),
+]
