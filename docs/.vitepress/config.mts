@@ -14,12 +14,10 @@ const baseConfig = isEdgeOne ? '/' : '/hello-gpu/'
 export default defineConfig({
   lang: 'zh-CN',
   title: 'Hello GPU',
-  description: '从硬件到智能体的 AI 基础设施实践教程（单卡 AMD GPU 视角；多卡见 hello-mlsys，平台层见 hello-ai-infra-platform）',
+  description: 'GPU 算子优化入门 + Agent 自动化（AMD Radeon RX 9070 XT + ROCm 6.4.x 实测）',
   base: baseConfig,
 
   cleanUrls: true,
-
-  srcExclude: ['part7-agent/**'],
 
   vue: {
     template: {

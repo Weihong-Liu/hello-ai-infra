@@ -1,0 +1,37 @@
+[project]
+name = "part4-models-agent"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.4.4",
+    "rocm==6.4.1",
+    "rocm-sdk-core==6.4.1",
+    "rocm-sdk-devel==6.4.1",
+    "rocm-sdk-libraries-gfx12==6.4.1",
+    "torch",   # 版本待机器到位后锁定，需 ROCm 6.4.x 对应的 radeon-ryzen wheel
+    "triton",  # 同上
+]
+
+# ⚠️ 占位配置：机器（9070XT）就绪后，wheel 源 URL 和 torch/triton 版本以实测为准。
+# 当前 wheel 源 URL 用 <待定> 占位，详见 .docs-rules/03-environment.md §5.3。
+# uv.lock 暂不入库，等 uv sync 跑通后再生成。
+[[tool.uv.index]]
+name = "rocm-amd"
+url = "https://<待定-radeon-ryzen-wheel源>"
+explicit = true
+
+[[tool.uv.index]]
+name = "pypi-mirror"
+url = "https://mirrors.bfsu.edu.cn/pypi/web/simple"
+default = true
+
+[tool.uv.sources]
+rocm = { index = "rocm-amd" }
+rocm-sdk-core = { index = "rocm-amd" }
+rocm-sdk-devel = { index = "rocm-amd" }
+rocm-sdk-libraries = { index = "rocm-amd" }
+rocm-sdk-libraries-gfx12 = { index = "rocm-amd" }
+rocm-core = { index = "rocm-amd" }
+rocm-smi-lib = { index = "rocm-amd" }
+torch = { index = "rocm-amd" }
+triton = { index = "rocm-amd" }
